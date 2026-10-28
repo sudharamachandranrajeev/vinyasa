@@ -1,0 +1,102 @@
+{
+  "format": "vinyasa-themes",
+  "version": 1,
+  "themes": [
+    {
+      "id": "terracotta",
+      "name": "Terracotta",
+      "seed": "#B5562F",
+      "accent": "#2F8F83",
+      "furniture": "#A86A45",
+      "zone": "#3E9BB0",
+      "light": { "background": "#FAF5F0" },
+      "dark": { "background": "#17110E" },
+      "radius": 18,
+      "font": "sans"
+    },
+    {
+      "id": "sage",
+      "name": "Sage",
+      "seed": "#5E7F5A",
+      "accent": "#C9853A",
+      "furniture": "#7A8F6A",
+      "zone": "#4C8DB5",
+      "light": { "background": "#F4F6F1" },
+      "dark": { "background": "#0F130F" },
+      "radius": 20,
+      "font": "sans"
+    },
+    {
+      "id": "japandi",
+      "name": "Japandi",
+      "seed": "#8A7560",
+      "accent": "#3B3B3B",
+      "furniture": "#B39878",
+      "zone": "#6F8C8A",
+      "light": { "background": "#F6F3EE" },
+      "dark": { "background": "#141210" },
+      "radius": 10,
+      "font": "sans"
+    },
+    {
+      "id": "indigo",
+      "name": "Indigo",
+      "seed": "#3F4FB0",
+      "accent": "#E8A33D",
+      "furniture": "#5866C4",
+      "zone": "#2FB0A0",
+      "light": { "background": "#F4F5FC" },
+      "dark": { "background": "#0D0F1C" },
+      "radius": 16,
+      "font": "sans"
+    },
+    {
+      "id": "marble",
+      "name": "Marble",
+      "seed": "#6E6A74",
+      "accent": "#B8925A",
+      "furniture": "#8C8792",
+      "zone": "#5E9AB8",
+      "light": { "background": "#F7F7F8" },
+      "dark": { "background": "#111113" },
+      "radius": 6,
+      "font": "sans"
+    },
+    {
+      "id": "coastal",
+      "name": "Coastal",
+      "seed": "#2A7FA8",
+      "accent": "#E3B26B",
+      "furniture": "#C4A27A",
+      "zone": "#3BB3C9",
+      "light": { "background": "#F2F8FA" },
+      "dark": { "background": "#0A1419" },
+      "radius": 24,
+      "font": "sans"
+    },
+    {
+      "id": "blueprint",
+      "name": "Blueprint",
+      "seed": "#1E5AA8",
+      "accent": "#F2C14E",
+      "furniture": "#4A86D4",
+      "zone": "#7FD1E8",
+      "light": { "background": "#F1F5FB" },
+      "dark": { "background": "#0A1426" },
+      "radius": 2,
+      "font": "mono"
+    },
+    {
+      "id": "saffron",
+      "name": "Saffron",
+      "seed": "#D9822B",
+      "accent": "#8E3B5F",
+      "furniture": "#C9772E",
+      "zone": "#3A9E8F",
+      "light": { "background": "#FDF6EC" },
+      "dark": { "background": "#18110A" },
+      "radius": 18,
+      "font": "sans"
+    }
+  ]
+}
