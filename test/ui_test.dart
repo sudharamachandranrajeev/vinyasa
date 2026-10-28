@@ -17,6 +17,7 @@ import 'package:vinyasa/ui/plan_view.dart';
 import 'package:vinyasa/ui/room_3d.dart';
 
 import 'app_harness.dart';
+import 'photos_test.dart' show openverseJson;
 import 'vision_test.dart' show planJson;
 
 /// An example home with the three sample rooms.
@@ -135,6 +136,36 @@ void main() {
     await app.close();
   });
 
+  testWidgets('an older kept plan moves the pieces but keeps later changes to the room', (tester) async {
+    final app = AppHarness(tester)..desktop();
+    late Item moved;
+    await app.open(
+      seed: (book) async {
+        await seedHome(book);
+        final now = (await book.room('room2'))!;
+        moved = now.items.firstWhere((i) => !i.fixed);
+        // The plan was made when the room had another name.
+        final arranged = now.copyWith(
+          name: 'Old name',
+          items: [for (final i in now.items) i.id == moved.id ? i.copyWith(x: i.x + 300) : i],
+        );
+        await book.savePlan(room: 'room2', arranged: arranged, before: 50, after: 60);
+      },
+    );
+    await app.run();
+    await app.tap(find.text('Kitchen').first);
+    await app.tap(find.widgetWithText(Tab, 'Arrange'));
+    await app.tapText('50 → 60');
+    for (final box in find.byType(Checkbox).evaluate().toList()) {
+      await app.tap(find.byWidget(box.widget));
+    }
+    await app.tap(find.text('Done: update the room'));
+    final room = (await tester.runAsync(() => app.book.room('room2')))!;
+    expect(room.name, 'Kitchen');
+    expect(room.item(moved.id)!.x, moved.x + 300);
+    await app.close();
+  });
+
   testWidgets('a plan made from a photo is checked, then replaces the room', (tester) async {
     final app = AppHarness(tester)..desktop();
     late Directory dir;
@@ -189,5 +220,31 @@ void main() {
     expect(room.name, 'Bedroom');
     await app.close();
     await tester.runAsync(() => dir.delete(recursive: true));
+  });
+
+  testWidgets('a photo from the ideas is pinned to the room’s moodboard', (tester) async {
+    final app = AppHarness(tester)..desktop();
+    await app.open(seed: seedHome);
+    await app.run(
+      client: MockClient(
+        (r) async => r.url.host == 'api.openverse.org'
+            ? http.Response(openverseJson(), 200)
+            : http.Response('[]', 200),
+      ),
+    );
+    await app.tap(find.text('Bedroom').first);
+    await app.tap(find.widgetWithText(Tab, 'Ideas'));
+    expect(find.text('Ana'), findsOneWidget);
+    await app.tap(find.text('Ana'));
+    expect(find.textContaining('CC BY 2.0'), findsWidgets);
+    await app.tapText('Pin to the moodboard');
+    final pins = await tester.runAsync(() => app.book.pins('room0'));
+    expect(pins, hasLength(1));
+    await tester.pageBack();
+    await app.settle();
+    expect(find.text('Ana'), findsNWidgets(2), reason: 'on the moodboard and in the ideas');
+    expect(find.byIcon(Icons.push_pin), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await app.close();
   });
 }

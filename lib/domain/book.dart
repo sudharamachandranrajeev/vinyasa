@@ -5,6 +5,7 @@ import 'package:drift/drift.dart';
 
 import '../db/database.dart';
 import 'json.dart';
+import 'photos.dart';
 import 'space.dart';
 
 /// Synced preferences. The prefs table is shared by every Brahma app, so
@@ -12,6 +13,9 @@ import 'space.dart';
 abstract final class PrefKeys {
   /// The look picked last on the Ideas page.
   static const ideasStyle = 'vinyasa.ideas.style';
+
+  /// Where ideas photos come from (PhotoSource.name).
+  static const photoSource = 'vinyasa.ideas.photos';
 }
 
 /// Settings that stay on this device.
@@ -100,6 +104,7 @@ class SpaceBook {
         kind: Value(kind.name),
         notes: Value(notes),
         updated: _now(),
+        deleted: const Value(false),
       ),
       key,
     );
@@ -149,6 +154,7 @@ class SpaceBook {
         json: room.encode(),
         score: Value(score ?? had?.score ?? -1),
         updated: _now(),
+        deleted: const Value(false),
       ),
       room.id,
     );
@@ -159,6 +165,9 @@ class SpaceBook {
       await store.remove(db.vinPlans, p.id);
     }
     await (db.delete(db.vinMedia)..where((m) => m.room.equals(id))).go();
+    for (final p in await pins(id)) {
+      await store.remove(db.vinPins, p.id);
+    }
     await store.remove(db.vinRooms, id);
   });
 
@@ -217,6 +226,37 @@ class SpaceBook {
 
   Future<void> removeMedia(String id) => (db.delete(db.vinMedia)..where((m) => m.id.equals(id))).go();
 
+  // ---- moodboard ----
+
+  /// A room's pinned ideas photos, newest first.
+  Future<List<PinRow>> pins(String room) =>
+      (db.select(db.vinPins)
+            ..where((p) => p.room.equals(room) & p.deleted.equals(false))
+            ..orderBy([(p) => OrderingTerm.desc(p.created)]))
+          .get();
+
+  /// Pins [photo] to [room]; pinning it again changes nothing. The id is
+  /// made from the room and the photo, so two devices pinning the same
+  /// photo make one pin.
+  Future<void> pin(String room, IdeaPhoto photo, {String? created}) {
+    final id = pinId(room, photo);
+    return store.save(
+      db.vinPins,
+      VinPinsCompanion.insert(
+        id: id,
+        room: room,
+        json: jsonEncode(photo.toJson()),
+        created: created ?? _now(),
+        deleted: const Value(false),
+      ),
+      id,
+    );
+  }
+
+  Future<void> unpin(String room, IdeaPhoto photo) => store.remove(db.vinPins, pinId(room, photo));
+
+  static String pinId(String room, IdeaPhoto p) => '$room.${p.source.name}.${p.id}';
+
   // ---- themes ----
 
   Future<List<ThemeRow>> themes() =>
@@ -227,7 +267,7 @@ class SpaceBook {
 
   Future<void> saveTheme(String id, String name, String json) => store.save(
     db.vinThemes,
-    VinThemesCompanion.insert(id: id, name: name, json: json, updated: _now()),
+    VinThemesCompanion.insert(id: id, name: name, json: json, updated: _now(), deleted: const Value(false)),
     id,
   );
 
@@ -235,7 +275,7 @@ class SpaceBook {
 
   // ---- backup ----
 
-  /// Every space with its rooms and plans, as one JSON document.
+  /// Every space with its rooms, plans and pins, as one JSON document.
   Future<String> exportAll() async => const JsonEncoder.withIndent(' ').convert({
     'format': backupFormat,
     'version': 1,
@@ -252,6 +292,9 @@ class SpaceBook {
               {
                 'room': decodeObject(r.json),
                 'score': r.score,
+                'pins': [
+                  for (final p in await pins(r.id)) {...decodeObject(p.json), 'pinned': p.created},
+                ],
                 'plans': [
                   for (final p in await plans(r.id))
                     {
@@ -287,6 +330,11 @@ class SpaceBook {
           if (room.id.isEmpty) continue;
           await saveRoom(room, space: space, score: intOf(r['score']));
           count++;
+          for (final p in objs(r['pins'])) {
+            final photo = IdeaPhoto.fromJson(p);
+            if (photo.id.isEmpty || photo.image.isEmpty) continue;
+            await pin(room.id, photo, created: str(p['pinned']).isEmpty ? null : str(p['pinned']));
+          }
           for (final p in objs(r['plans'])) {
             final id = str(p['id']).isEmpty ? newId() : str(p['id']);
             await store.save(
@@ -299,6 +347,7 @@ class SpaceBook {
                 scoreBefore: intOf(p['before']) ?? 0,
                 scoreAfter: intOf(p['after']) ?? 0,
                 created: str(p['created']).isEmpty ? _now() : str(p['created']),
+                deleted: const Value(false),
               ),
               id,
             );

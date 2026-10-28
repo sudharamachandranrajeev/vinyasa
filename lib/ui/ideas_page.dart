@@ -7,10 +7,11 @@ import '../domain/book.dart';
 import '../domain/ideas.dart';
 import '../domain/space.dart';
 import 'common.dart';
+import 'idea_photos.dart';
 import 'motion.dart';
 
-/// Looks to aim for, the most-loved tips, and searches on Pinterest, Houzz,
-/// Behance, Dribbble and Unsplash.
+/// Looks to aim for, photos of them, the most-loved tips, and searches on
+/// Pinterest, Houzz, Behance, Dribbble and Unsplash.
 class IdeasPage extends ConsumerWidget {
   const IdeasPage({super.key});
 
@@ -27,6 +28,12 @@ class IdeasPage extends ConsumerWidget {
             selected: picked?.id,
             onPick: (l) =>
                 ref.mutate((s) => s.book.setPref(PrefKeys.ideasStyle, l.id == picked?.id ? '' : l.id)),
+          ),
+        ),
+        SectionCard(
+          title: picked == null ? 'Photos' : 'Photos of ${picked.name.toLowerCase()} rooms',
+          child: IdeaPhotos(
+            query: picked == null ? 'interior design living room' : '${picked.name.toLowerCase()} interior',
           ),
         ),
         if (picked != null)
@@ -157,8 +164,8 @@ class _TipTile extends StatelessWidget {
   );
 }
 
-/// Ideas for one room: its look, searches built from its type and size,
-/// and the tips that apply to it.
+/// Ideas for one room: its look, its moodboard, photos and searches built
+/// from its type and size, and the tips that apply to it.
 class RoomIdeas extends ConsumerWidget {
   const RoomIdeas({super.key, required this.room, required this.onLook});
   final Room room;
@@ -181,6 +188,17 @@ class RoomIdeas extends ConsumerWidget {
               SectionCard(
                 title: 'The look you want',
                 child: LookGrid(selected: look?.id, onPick: (l) => onLook(l.id == look?.id ? '' : l.id)),
+              ),
+              SectionCard(
+                title: 'Moodboard',
+                child: Moodboard(room: room.id),
+              ),
+              SectionCard(
+                title: 'Photos for this room',
+                child: IdeaPhotos(
+                  query: ideaQuery(room, look: look, extra: 'interior'),
+                  room: room.id,
+                ),
               ),
               SectionCard(
                 title: 'Search for this room',

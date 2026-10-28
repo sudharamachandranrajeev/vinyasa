@@ -1649,6 +1649,349 @@ class VinMediaCompanion extends UpdateCompanion<MediaRow> {
   }
 }
 
+class $VinPinsTable extends VinPins with TableInfo<$VinPinsTable, PinRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $VinPinsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _hlcMeta = const VerificationMeta('hlc');
+  @override
+  late final GeneratedColumn<String> hlc = GeneratedColumn<String>(
+    'hlc',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _deletedMeta = const VerificationMeta('deleted');
+  @override
+  late final GeneratedColumn<bool> deleted = GeneratedColumn<bool>(
+    'deleted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('CHECK ("deleted" IN (0, 1))'),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _roomMeta = const VerificationMeta('room');
+  @override
+  late final GeneratedColumn<String> room = GeneratedColumn<String>(
+    'room',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _jsonMeta = const VerificationMeta('json');
+  @override
+  late final GeneratedColumn<String> json = GeneratedColumn<String>(
+    'json',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdMeta = const VerificationMeta('created');
+  @override
+  late final GeneratedColumn<String> created = GeneratedColumn<String>(
+    'created',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, hlc, deleted, room, json, created];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'vin_pins';
+  @override
+  VerificationContext validateIntegrity(Insertable<PinRow> instance, {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('hlc')) {
+      context.handle(_hlcMeta, hlc.isAcceptableOrUnknown(data['hlc']!, _hlcMeta));
+    }
+    if (data.containsKey('deleted')) {
+      context.handle(_deletedMeta, deleted.isAcceptableOrUnknown(data['deleted']!, _deletedMeta));
+    }
+    if (data.containsKey('room')) {
+      context.handle(_roomMeta, room.isAcceptableOrUnknown(data['room']!, _roomMeta));
+    } else if (isInserting) {
+      context.missing(_roomMeta);
+    }
+    if (data.containsKey('json')) {
+      context.handle(_jsonMeta, json.isAcceptableOrUnknown(data['json']!, _jsonMeta));
+    } else if (isInserting) {
+      context.missing(_jsonMeta);
+    }
+    if (data.containsKey('created')) {
+      context.handle(_createdMeta, created.isAcceptableOrUnknown(data['created']!, _createdMeta));
+    } else if (isInserting) {
+      context.missing(_createdMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PinRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PinRow(
+      id: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}id'])!,
+      hlc: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}hlc'])!,
+      deleted: attachedDatabase.typeMapping.read(DriftSqlType.bool, data['${effectivePrefix}deleted'])!,
+      room: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}room'])!,
+      json: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}json'])!,
+      created: attachedDatabase.typeMapping.read(DriftSqlType.string, data['${effectivePrefix}created'])!,
+    );
+  }
+
+  @override
+  $VinPinsTable createAlias(String alias) {
+    return $VinPinsTable(attachedDatabase, alias);
+  }
+}
+
+class PinRow extends DataClass implements Insertable<PinRow> {
+  final String id;
+  final String hlc;
+  final bool deleted;
+  final String room;
+  final String json;
+  final String created;
+  const PinRow({
+    required this.id,
+    required this.hlc,
+    required this.deleted,
+    required this.room,
+    required this.json,
+    required this.created,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['hlc'] = Variable<String>(hlc);
+    map['deleted'] = Variable<bool>(deleted);
+    map['room'] = Variable<String>(room);
+    map['json'] = Variable<String>(json);
+    map['created'] = Variable<String>(created);
+    return map;
+  }
+
+  VinPinsCompanion toCompanion(bool nullToAbsent) {
+    return VinPinsCompanion(
+      id: Value(id),
+      hlc: Value(hlc),
+      deleted: Value(deleted),
+      room: Value(room),
+      json: Value(json),
+      created: Value(created),
+    );
+  }
+
+  factory PinRow.fromJson(Map<String, dynamic> json, {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PinRow(
+      id: serializer.fromJson<String>(json['id']),
+      hlc: serializer.fromJson<String>(json['hlc']),
+      deleted: serializer.fromJson<bool>(json['deleted']),
+      room: serializer.fromJson<String>(json['room']),
+      json: serializer.fromJson<String>(json['json']),
+      created: serializer.fromJson<String>(json['created']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'hlc': serializer.toJson<String>(hlc),
+      'deleted': serializer.toJson<bool>(deleted),
+      'room': serializer.toJson<String>(room),
+      'json': serializer.toJson<String>(json),
+      'created': serializer.toJson<String>(created),
+    };
+  }
+
+  PinRow copyWith({String? id, String? hlc, bool? deleted, String? room, String? json, String? created}) =>
+      PinRow(
+        id: id ?? this.id,
+        hlc: hlc ?? this.hlc,
+        deleted: deleted ?? this.deleted,
+        room: room ?? this.room,
+        json: json ?? this.json,
+        created: created ?? this.created,
+      );
+  PinRow copyWithCompanion(VinPinsCompanion data) {
+    return PinRow(
+      id: data.id.present ? data.id.value : this.id,
+      hlc: data.hlc.present ? data.hlc.value : this.hlc,
+      deleted: data.deleted.present ? data.deleted.value : this.deleted,
+      room: data.room.present ? data.room.value : this.room,
+      json: data.json.present ? data.json.value : this.json,
+      created: data.created.present ? data.created.value : this.created,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PinRow(')
+          ..write('id: $id, ')
+          ..write('hlc: $hlc, ')
+          ..write('deleted: $deleted, ')
+          ..write('room: $room, ')
+          ..write('json: $json, ')
+          ..write('created: $created')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, hlc, deleted, room, json, created);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PinRow &&
+          other.id == this.id &&
+          other.hlc == this.hlc &&
+          other.deleted == this.deleted &&
+          other.room == this.room &&
+          other.json == this.json &&
+          other.created == this.created);
+}
+
+class VinPinsCompanion extends UpdateCompanion<PinRow> {
+  final Value<String> id;
+  final Value<String> hlc;
+  final Value<bool> deleted;
+  final Value<String> room;
+  final Value<String> json;
+  final Value<String> created;
+  final Value<int> rowid;
+  const VinPinsCompanion({
+    this.id = const Value.absent(),
+    this.hlc = const Value.absent(),
+    this.deleted = const Value.absent(),
+    this.room = const Value.absent(),
+    this.json = const Value.absent(),
+    this.created = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  VinPinsCompanion.insert({
+    required String id,
+    this.hlc = const Value.absent(),
+    this.deleted = const Value.absent(),
+    required String room,
+    required String json,
+    required String created,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       room = Value(room),
+       json = Value(json),
+       created = Value(created);
+  static Insertable<PinRow> custom({
+    Expression<String>? id,
+    Expression<String>? hlc,
+    Expression<bool>? deleted,
+    Expression<String>? room,
+    Expression<String>? json,
+    Expression<String>? created,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (hlc != null) 'hlc': hlc,
+      if (deleted != null) 'deleted': deleted,
+      if (room != null) 'room': room,
+      if (json != null) 'json': json,
+      if (created != null) 'created': created,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  VinPinsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? hlc,
+    Value<bool>? deleted,
+    Value<String>? room,
+    Value<String>? json,
+    Value<String>? created,
+    Value<int>? rowid,
+  }) {
+    return VinPinsCompanion(
+      id: id ?? this.id,
+      hlc: hlc ?? this.hlc,
+      deleted: deleted ?? this.deleted,
+      room: room ?? this.room,
+      json: json ?? this.json,
+      created: created ?? this.created,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (hlc.present) {
+      map['hlc'] = Variable<String>(hlc.value);
+    }
+    if (deleted.present) {
+      map['deleted'] = Variable<bool>(deleted.value);
+    }
+    if (room.present) {
+      map['room'] = Variable<String>(room.value);
+    }
+    if (json.present) {
+      map['json'] = Variable<String>(json.value);
+    }
+    if (created.present) {
+      map['created'] = Variable<String>(created.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('VinPinsCompanion(')
+          ..write('id: $id, ')
+          ..write('hlc: $hlc, ')
+          ..write('deleted: $deleted, ')
+          ..write('room: $room, ')
+          ..write('json: $json, ')
+          ..write('created: $created, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $VinThemesTable extends VinThemes with TableInfo<$VinThemesTable, ThemeRow> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -2848,6 +3191,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $VinRoomsTable vinRooms = $VinRoomsTable(this);
   late final $VinPlansTable vinPlans = $VinPlansTable(this);
   late final $VinMediaTable vinMedia = $VinMediaTable(this);
+  late final $VinPinsTable vinPins = $VinPinsTable(this);
   late final $VinThemesTable vinThemes = $VinThemesTable(this);
   late final $PrefsTable prefs = $PrefsTable(this);
   late final $OutboxTable outbox = $OutboxTable(this);
@@ -2862,6 +3206,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     vinRooms,
     vinPlans,
     vinMedia,
+    vinPins,
     vinThemes,
     prefs,
     outbox,
@@ -3674,6 +4019,188 @@ typedef $$VinMediaTableProcessedTableManager =
       MediaRow,
       PrefetchHooks Function()
     >;
+typedef $$VinPinsTableCreateCompanionBuilder = VinPinsCompanion Function({
+  required String id,
+  Value<String> hlc,
+  Value<bool> deleted,
+  required String room,
+  required String json,
+  required String created,
+  Value<int> rowid,
+});
+typedef $$VinPinsTableUpdateCompanionBuilder = VinPinsCompanion Function({
+  Value<String> id,
+  Value<String> hlc,
+  Value<bool> deleted,
+  Value<String> room,
+  Value<String> json,
+  Value<String> created,
+  Value<int> rowid,
+});
+
+class $$VinPinsTableFilterComposer extends Composer<_$AppDatabase, $VinPinsTable> {
+  $$VinPinsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get hlc =>
+      $composableBuilder(column: $table.hlc, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get deleted =>
+      $composableBuilder(column: $table.deleted, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get room =>
+      $composableBuilder(column: $table.room, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get json =>
+      $composableBuilder(column: $table.json, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get created =>
+      $composableBuilder(column: $table.created, builder: (column) => ColumnFilters(column));
+}
+
+class $$VinPinsTableOrderingComposer extends Composer<_$AppDatabase, $VinPinsTable> {
+  $$VinPinsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get hlc =>
+      $composableBuilder(column: $table.hlc, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get deleted =>
+      $composableBuilder(column: $table.deleted, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get room =>
+      $composableBuilder(column: $table.room, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get json =>
+      $composableBuilder(column: $table.json, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get created =>
+      $composableBuilder(column: $table.created, builder: (column) => ColumnOrderings(column));
+}
+
+class $$VinPinsTableAnnotationComposer extends Composer<_$AppDatabase, $VinPinsTable> {
+  $$VinPinsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id => $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get hlc => $composableBuilder(column: $table.hlc, builder: (column) => column);
+
+  GeneratedColumn<bool> get deleted =>
+      $composableBuilder(column: $table.deleted, builder: (column) => column);
+
+  GeneratedColumn<String> get room => $composableBuilder(column: $table.room, builder: (column) => column);
+
+  GeneratedColumn<String> get json => $composableBuilder(column: $table.json, builder: (column) => column);
+
+  GeneratedColumn<String> get created =>
+      $composableBuilder(column: $table.created, builder: (column) => column);
+}
+
+class $$VinPinsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $VinPinsTable,
+          PinRow,
+          $$VinPinsTableFilterComposer,
+          $$VinPinsTableOrderingComposer,
+          $$VinPinsTableAnnotationComposer,
+          $$VinPinsTableCreateCompanionBuilder,
+          $$VinPinsTableUpdateCompanionBuilder,
+          (PinRow, BaseReferences<_$AppDatabase, $VinPinsTable, PinRow>),
+          PinRow,
+          PrefetchHooks Function()
+        > {
+  $$VinPinsTableTableManager(_$AppDatabase db, $VinPinsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () => $$VinPinsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () => $$VinPinsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () => $$VinPinsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> hlc = const Value.absent(),
+                Value<bool> deleted = const Value.absent(),
+                Value<String> room = const Value.absent(),
+                Value<String> json = const Value.absent(),
+                Value<String> created = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => VinPinsCompanion(
+                id: id,
+                hlc: hlc,
+                deleted: deleted,
+                room: room,
+                json: json,
+                created: created,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<String> hlc = const Value.absent(),
+                Value<bool> deleted = const Value.absent(),
+                required String room,
+                required String json,
+                required String created,
+                Value<int> rowid = const Value.absent(),
+              }) => VinPinsCompanion.insert(
+                id: id,
+                hlc: hlc,
+                deleted: deleted,
+                room: room,
+                json: json,
+                created: created,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$VinPinsTable, PinRow>(table),
+                  BaseReferences<_$AppDatabase, $VinPinsTable, PinRow>(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$VinPinsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $VinPinsTable,
+      PinRow,
+      $$VinPinsTableFilterComposer,
+      $$VinPinsTableOrderingComposer,
+      $$VinPinsTableAnnotationComposer,
+      $$VinPinsTableCreateCompanionBuilder,
+      $$VinPinsTableUpdateCompanionBuilder,
+      (PinRow, BaseReferences<_$AppDatabase, $VinPinsTable, PinRow>),
+      PinRow,
+      PrefetchHooks Function()
+    >;
 typedef $$VinThemesTableCreateCompanionBuilder = VinThemesCompanion Function({
   required String id,
   Value<String> hlc,
@@ -4359,6 +4886,7 @@ class $AppDatabaseManager {
   $$VinRoomsTableTableManager get vinRooms => $$VinRoomsTableTableManager(_db, _db.vinRooms);
   $$VinPlansTableTableManager get vinPlans => $$VinPlansTableTableManager(_db, _db.vinPlans);
   $$VinMediaTableTableManager get vinMedia => $$VinMediaTableTableManager(_db, _db.vinMedia);
+  $$VinPinsTableTableManager get vinPins => $$VinPinsTableTableManager(_db, _db.vinPins);
   $$VinThemesTableTableManager get vinThemes => $$VinThemesTableTableManager(_db, _db.vinThemes);
   $$PrefsTableTableManager get prefs => $$PrefsTableTableManager(_db, _db.prefs);
   $$OutboxTableTableManager get outbox => $$OutboxTableTableManager(_db, _db.outbox);

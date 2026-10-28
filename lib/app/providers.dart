@@ -8,6 +8,8 @@ import 'package:http/http.dart' as http;
 import '../db/database.dart';
 import '../domain/analysis.dart';
 import '../domain/book.dart';
+import '../domain/json.dart';
+import '../domain/photos.dart';
 import '../domain/space.dart';
 import '../domain/themes.dart';
 import '../domain/update.dart';
@@ -37,6 +39,39 @@ final visionAskerProvider = Provider<Future<VisionAsker> Function(HelpAiSetup)>(
     client: ref.read(httpClientProvider),
   );
 });
+
+/// Searches for ideas photos with the keys in the keychain. Rebuilt when a
+/// key changes (ref.invalidate), which also forgets the remembered answers.
+final photoFinderProvider = FutureProvider<PhotoFinder>((ref) async {
+  final vault = ref.watch(keyVaultProvider);
+  return PhotoFinder(
+    ref.watch(httpClientProvider),
+    unsplashKey: await vault.photoKey(PhotoSource.unsplash),
+    openverse: OpenverseApp.decode(await vault.photoKey(PhotoSource.openverse)),
+  );
+});
+
+/// The source picked last for ideas photos.
+final photoSourceProvider = FutureProvider<PhotoSource>((ref) async {
+  ref.watch(revisionProvider);
+  return PhotoSource.of(await ref.watch(sessionProvider).book.pref<String>(PrefKeys.photoSource, ''));
+});
+
+/// A room's moodboard.
+final pinsProvider = FutureProvider.family<List<IdeaPhoto>, String>((ref, room) async {
+  ref.watch(revisionProvider);
+  final rows = await ref.watch(sessionProvider).book.pins(room);
+  return [for (final r in rows) ?_tryPhoto(r.json)];
+});
+
+IdeaPhoto? _tryPhoto(String json) {
+  try {
+    final p = IdeaPhoto.fromJson(decodeObject(json));
+    return p.image.isEmpty ? null : p;
+  } on FormatException {
+    return null;
+  }
+}
 
 /// What main() and the tests override: the session, under both its own and
 /// its shared type, and the app's identity and hints.

@@ -36,8 +36,8 @@ const vinyasaHints = <String, String>{
       'Add a space, then its rooms: size, doors and windows, and the furniture in it. Vinyasa checks the '
       'room against about fifty rules and can rearrange it, step by step.',
   'page.ideas':
-      'Pick a look to see its palette and what makes it work. The search buttons open Pinterest, Houzz, '
-      'Behance, Dribbble or Unsplash with a search for that look.',
+      'Pick a look to see its palette, photos of it and what makes it work. Pin photos you like to a '
+      'room’s moodboard. The search buttons open Pinterest, Houzz, Behance, Dribbble or Unsplash.',
   'page.themes':
       'Themes set the colours, the corner roundness and the font. Make your own from scratch or from a '
       'copy, and share them as a small JSON file.',

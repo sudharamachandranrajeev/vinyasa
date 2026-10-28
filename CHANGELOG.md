@@ -28,6 +28,13 @@
   scaled to the measured room; unsure pieces start unticked and glow on the plan for checking.
 - Ideas: twelve looks with palettes, the most-loved tips, and searches on Pinterest, Houzz, Behance,
   Dribbble and Unsplash built from the room and the look.
+- Photos in Ideas: a grid of photos for the room and look from Openverse (openly licensed, no key;
+  registering an email raises the limit) or Unsplash (with the user's own access key). Each photo opens
+  large with its creator, licence and source. Pin photos to a room's moodboard; pins sync with the room
+  and travel in backups, while the photos stay at their sources.
+- Fixed: keeping an older plan no longer undoes changes made to the room since (its name, its users,
+  new pieces); only the pieces the plan moved are moved.
+- Fixed: restoring a backup brings back spaces, rooms and plans removed since it was made.
 - Eight themes made for interiors, a theme editor, light and dark, and a calm mode.
 - Updates from GitHub releases, checked against SHA-256 sums, with a backup before each install.
   Going back to an earlier version from Settings (on Android: backup, then the release page).

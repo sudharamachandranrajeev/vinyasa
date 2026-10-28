@@ -348,8 +348,17 @@ class _StepsPageState extends ConsumerState<StepsPage> with SingleTickerProvider
     await ref.mutate((x) => x.book.setStepsDone(widget.plan.id, _done));
   }
 
-  Future<void> _apply(Room arranged) async {
-    await ref.mutate((s) => s.book.saveRoom(arranged, space: widget.space, score: analyse(arranged).overall));
+  /// Moves the pieces of the room as it is [now] to where [arranged] put
+  /// them, so changes made since the plan (a new name, a new piece) stay.
+  Future<void> _apply(Room now, Room arranged) async {
+    final placed = {for (final i in arranged.items) i.id: i};
+    final room = now.copyWith(
+      items: [
+        for (final i in now.items)
+          if (placed[i.id] case final p?) i.copyWith(x: p.x, y: p.y, rot: p.rot) else i,
+      ],
+    );
+    await ref.mutate((s) => s.book.saveRoom(room, space: widget.space, score: analyse(room).overall));
     if (!mounted) return;
     showMessage(context, 'The room now has its new arrangement.');
     Navigator.pop(context);
@@ -437,7 +446,7 @@ class _StepsPageState extends ConsumerState<StepsPage> with SingleTickerProvider
           ),
         const SizedBox(height: 8),
         FilledButton.icon(
-          onPressed: allDone ? () => _apply(arranged) : null,
+          onPressed: allDone ? () => _apply(now, arranged) : null,
           icon: const Icon(Icons.done_all),
           label: Text(allDone ? 'Done: update the room' : 'Tick every step to update the room'),
         ),

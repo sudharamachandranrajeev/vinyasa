@@ -42,7 +42,10 @@ arrangement you can carry out one step at a time.
   lifting, moving things that belong together as one. The pieces glide to their new places; keep the
   plan and follow it step by step.
 * **Ideas** – twelve looks with their palettes, the tips people rate most, and searches on Pinterest,
-  Houzz, Behance, Dribbble and Unsplash for your room and look.
+  Houzz, Behance, Dribbble and Unsplash for your room and look. Photos for the room come straight into
+  the app from [Openverse](https://openverse.org) (openly licensed, no account needed) or
+  [Unsplash](https://unsplash.com) (with your own free access key), each with its creator and licence.
+  Pin the ones you like to the room's moodboard.
 * **Themes** – eight themes made for interiors, your own in the theme editor, light and dark.
 * **Updates and going back** – updates install from GitHub releases after their checksums match, with a
   backup first. Settings › Updates goes back to an earlier version.

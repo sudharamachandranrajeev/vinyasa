@@ -69,6 +69,15 @@ class VinMedia extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// An ideas photo pinned to a room's moodboard: a link to the photo and its
+/// credit (domain/photos.dart IdeaPhoto JSON), never the image itself.
+@DataClassName('PinRow')
+class VinPins extends Table with SyncedRow {
+  TextColumn get room => text()();
+  TextColumn get json => text()();
+  TextColumn get created => text()();
+}
+
 /// A theme made in the theme manager, stored as its export JSON.
 @DataClassName('ThemeRow')
 class VinThemes extends Table with SyncedRow {
