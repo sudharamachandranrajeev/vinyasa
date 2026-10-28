@@ -243,6 +243,33 @@ void main() {
     }
   });
 
+  testWidgets('a piece to buy is tried in the room and put on the plan', (tester) async {
+    for (final phone in [false, true]) {
+      final app = AppHarness(tester);
+      phone ? app.phone() : app.desktop();
+      await app.open(seed: seedHome);
+      await app.run();
+      await app.tap(find.text('Bedroom').first);
+      await app.tap(find.widgetWithText(Tab, 'Arrange'));
+      await app.tapText('Will it fit?');
+      await app.tapText('What is it?');
+      await tester.enterText(find.byType(TextField).last, 'bookshelf');
+      await app.settle();
+      await app.tap(find.text('Bookshelf').last);
+      await app.tapText('Find places');
+      // The places are found in an isolate: real time.
+      await tester.runAsync(() => Future<void>.delayed(const Duration(seconds: 3)));
+      await app.settle();
+      expect(find.text('Gets through the door'), findsOneWidget);
+      expect(find.text('Best place'), findsOneWidget);
+      await app.tap(find.text('Put it here on the plan').first);
+      final room = await tester.runAsync(() => app.book.room('room0'));
+      expect(room!.items.where((i) => i.kind == 'bookshelf'), hasLength(1));
+      expect(tester.takeException(), isNull, reason: 'phone: $phone');
+      await app.close();
+    }
+  });
+
   testWidgets('a photo from the ideas is pinned to the room’s moodboard', (tester) async {
     final app = AppHarness(tester)..desktop();
     await app.open(seed: seedHome);

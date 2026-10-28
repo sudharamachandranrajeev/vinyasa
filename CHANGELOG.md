@@ -38,6 +38,11 @@
   room (adult, older people, wheelchair 380–1220 mm). Shoes, books, papers and clothes go to storage made
   for them. Steps follow the room: KonMari order at home, 5S red-tagging with a 7-day decision at work,
   ABC slotting in a storeroom. Labels as a printable sheet or a copied list. Kept with the room.
+- Will it fit? (in Arrange): give the size of a piece you are thinking of buying and Vinyasa tries it
+  against every wall and, for pieces that need no wall, out in the room. It shows the three best places,
+  at least 700 mm apart, each checked by the analysis rules with the score before and after, and puts
+  the piece on the plan in one tap. It also checks the piece gets through the widest doorway, on its
+  side or tilted (doors assumed 2000 mm high).
 - Fixed: keeping an older plan no longer undoes changes made to the room since (its name, its users,
   new pieces); only the pieces the plan moved are moved.
 - Fixed: restoring a backup brings back spaces, rooms and plans removed since it was made.

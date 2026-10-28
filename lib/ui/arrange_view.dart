@@ -10,6 +10,7 @@ import '../domain/analysis.dart';
 import '../domain/planner.dart';
 import '../domain/space.dart';
 import '../domain/steps.dart';
+import 'fit_page.dart';
 import 'look.dart';
 import 'motion.dart';
 import 'plan_view.dart';
@@ -215,6 +216,27 @@ class _ArrangeViewState extends ConsumerState<ArrangeView> with SingleTickerProv
         const SizedBox(height: 8),
         for (final p in plans) _PlanTile(plan: p, roomId: widget.room.id, space: widget.space),
       ],
+      const SizedBox(height: 16),
+      SectionCard(
+        title: 'Thinking of buying something?',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Give its size and see the best places for it here, what each does to the score, and whether it '
+              'gets through the door.',
+            ),
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: () =>
+                  Navigator.of(context)
+                      .push(fluidRoute(FitPage(roomId: widget.room.id, space: widget.space))),
+              icon: const Icon(Icons.straighten),
+              label: const Text('Will it fit?'),
+            ),
+          ],
+        ),
+      ),
     ];
     return ListView(
       padding: EdgeInsets.fromLTRB(16, 12, 16, 96 + MediaQuery.paddingOf(context).bottom),
