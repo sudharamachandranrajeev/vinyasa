@@ -14,6 +14,7 @@ import 'plan_editor.dart';
 import 'plan_view.dart';
 import 'room_3d.dart';
 import 'room_form.dart';
+import 'storage_view.dart';
 
 /// Saves [room] in [space] with its score, so lists show it without
 /// running the rules again.
@@ -32,7 +33,7 @@ class RoomPage extends ConsumerStatefulWidget {
 }
 
 class _RoomPageState extends ConsumerState<RoomPage> with SingleTickerProviderStateMixin {
-  late final _tabs = TabController(length: 6, vsync: this);
+  late final _tabs = TabController(length: 7, vsync: this);
 
   @override
   void dispose() {
@@ -99,6 +100,7 @@ class _RoomPageState extends ConsumerState<RoomPage> with SingleTickerProviderSt
             Tab(icon: Icon(Icons.view_in_ar_outlined), text: '3D'),
             Tab(icon: Icon(Icons.fact_check_outlined), text: 'Analysis'),
             Tab(icon: Icon(Icons.auto_awesome_outlined), text: 'Arrange'),
+            Tab(icon: Icon(Icons.inventory_2_outlined), text: 'Storage'),
             Tab(icon: Icon(Icons.photo_library_outlined), text: 'Photos'),
             Tab(icon: Icon(Icons.lightbulb_outline), text: 'Ideas'),
           ],
@@ -128,6 +130,7 @@ class _RoomPageState extends ConsumerState<RoomPage> with SingleTickerProviderSt
                       ? const SizedBox.shrink()
                       : AnalysisView(report: report, onArrange: () => _tabs.animateTo(3)),
                   ArrangeView(room: r, space: widget.space),
+                  StorageView(room: r, onChanged: (x) => storeRoom(ref, x, widget.space)),
                   PhotosView(room: r, space: widget.space),
                   RoomIdeas(
                     room: r,

@@ -68,7 +68,7 @@ void main() {
       expect(find.text('Example home'), findsOneWidget);
       await app.tap(find.text('Bedroom').first);
       expect(find.byType(PlanView), findsWidgets);
-      for (final tab in ['3D', 'Analysis', 'Arrange', 'Photos', 'Ideas', 'Plan']) {
+      for (final tab in ['3D', 'Analysis', 'Arrange', 'Storage', 'Photos', 'Ideas', 'Plan']) {
         await app.tap(find.widgetWithText(Tab, tab));
         expect(tester.takeException(), isNull, reason: '$tab (phone: $phone)');
       }
@@ -220,6 +220,27 @@ void main() {
     expect(room.name, 'Bedroom');
     await app.close();
     await tester.runAsync(() => dir.delete(recursive: true));
+  });
+
+  testWidgets('things listed on the Storage tab are given shelves and kept with the room', (tester) async {
+    for (final phone in [false, true]) {
+      final app = AppHarness(tester);
+      phone ? app.phone() : app.desktop();
+      await app.open(seed: seedHome);
+      await app.run();
+      await app.tap(find.text('Bedroom').first);
+      await app.tap(find.widgetWithText(Tab, 'Storage'));
+      await app.tapText('Add things');
+      await tester.enterText(find.byType(TextField).first, 'Shirts, Winter quilt');
+      await app.tapText('Save');
+      expect(find.text('Where things go'), findsOneWidget);
+      expect(find.text('Shirts'), findsWidgets);
+      expect(find.textContaining('Shelf 1'), findsWidgets);
+      final room = await tester.runAsync(() => app.book.room('room0'));
+      expect(room!.things.map((t) => t.name), ['Shirts', 'Winter quilt']);
+      expect(tester.takeException(), isNull, reason: 'phone: $phone');
+      await app.close();
+    }
   });
 
   testWidgets('a photo from the ideas is pinned to the room’s moodboard', (tester) async {

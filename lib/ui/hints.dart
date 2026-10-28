@@ -24,6 +24,10 @@ const vinyasaHints = <String, String>{
   '3d.how':
       'Drag to turn the room, pinch or scroll to zoom, and drag with two fingers, the right mouse button or '
       'Shift held to move it. The walls nearest you are lowered so you can see in.',
+  'storage.how':
+      'Shelves are rated by how easy they are to reach for the people who use the room: waist to shoulder '
+      'is best, and a wheelchair user’s reach is 380 to 1220 mm. Daily things go in the easiest places '
+      'near the door, heavy things low, and rarely used things out of the way.',
   'arrange.how':
       'Vinyasa tries thousands of small changes, keeps those that fix problems without moving more than '
       'needed, and moves things that belong together (a bed and its bedside tables) as one.',

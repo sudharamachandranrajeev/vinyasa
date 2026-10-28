@@ -10,6 +10,7 @@ import 'dart:math' as math;
 
 import 'catalog.dart';
 import 'json.dart';
+import 'stored.dart';
 
 /// The JSON version this build writes; older ones are read and upgraded.
 const roomFormatVersion = 1;
@@ -409,6 +410,7 @@ class Room {
     this.openings = const [],
     this.items = const [],
     this.occupants = const Occupants(),
+    this.things = const [],
     this.weights = const {},
     this.vaastu = VaastuMode.gentle,
     this.style = '',
@@ -429,6 +431,9 @@ class Room {
   final List<Opening> openings;
   final List<Item> items;
   final Occupants occupants;
+
+  /// What the room's storage holds (stored.dart).
+  final List<Thing> things;
 
   /// How much each category counts, 0 to 3; missing ones count 1 (Vaastu
   /// follows [vaastu] instead).
@@ -493,6 +498,7 @@ class Room {
     List<Opening>? openings,
     List<Item>? items,
     Occupants? occupants,
+    List<Thing>? things,
     Map<Category, int>? weights,
     VaastuMode? vaastu,
     String? style,
@@ -508,6 +514,7 @@ class Room {
     openings: openings ?? this.openings,
     items: items ?? this.items,
     occupants: occupants ?? this.occupants,
+    things: things ?? this.things,
     weights: weights ?? this.weights,
     vaastu: vaastu ?? this.vaastu,
     style: style ?? this.style,
@@ -529,6 +536,7 @@ class Room {
     'openings': [for (final o in openings) o.toJson()],
     'items': [for (final i in items) i.toJson()],
     'occupants': occupants.toJson(),
+    if (things.isNotEmpty) 'things': [for (final t in things) t.toJson()],
     if (weights.isNotEmpty) 'weights': {for (final e in weights.entries) e.key.name: e.value},
     'vaastu': vaastu.name,
     if (style.isNotEmpty) 'style': style,
@@ -550,6 +558,7 @@ class Room {
     openings: [for (final o in objs(j['openings'])) Opening.fromJson(o)],
     items: [for (final i in objs(j['items'])) Item.fromJson(i)],
     occupants: Occupants.fromJson(obj(j['occupants'])),
+    things: [for (final t in objs(j['things'])) Thing.fromJson(t)],
     weights: {
       for (final c in Category.values)
         if (obj(j['weights']).containsKey(c.name)) c: (intOf(obj(j['weights'])[c.name]) ?? 1).clamp(0, 3),

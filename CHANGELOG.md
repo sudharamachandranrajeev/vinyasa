@@ -32,6 +32,12 @@
   registering an email raises the limit) or Unsplash (with the user's own access key). Each photo opens
   large with its creator, licence and source. Pin photos to a room's moodboard; pins sync with the room
   and travel in backups, while the photos stay at their sources.
+- Storage tab: list what a room's wardrobes, shelves and cabinets hold (sort of thing, how often used,
+  heavy or not). Vinyasa gives each thing a shelf: daily things on the easiest shelves nearest the door,
+  heavy things low and never overhead, rarely used things out of the way, with reach set by who uses the
+  room (adult, older people, wheelchair 380–1220 mm). Shoes, books, papers and clothes go to storage made
+  for them. Steps follow the room: KonMari order at home, 5S red-tagging with a 7-day decision at work,
+  ABC slotting in a storeroom. Labels as a printable sheet or a copied list. Kept with the room.
 - Fixed: keeping an older plan no longer undoes changes made to the room since (its name, its users,
   new pieces); only the pieces the plan moved are moved.
 - Fixed: restoring a backup brings back spaces, rooms and plans removed since it was made.

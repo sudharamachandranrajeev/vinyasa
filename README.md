@@ -41,6 +41,10 @@ arrangement you can carry out one step at a time.
 * **Arrange** – Vinyasa tries thousands of arrangements and keeps the one that fixes most for the least
   lifting, moving things that belong together as one. The pieces glide to their new places; keep the
   plan and follow it step by step.
+* **Storage** – list what your wardrobes, shelves and cabinets hold and Vinyasa says which shelf each
+  thing goes on: everyday things at easy reach near the door, heavy things low, rare things out of the
+  way, with reach set by who uses the room. It follows KonMari at home, 5S at work and ABC slotting in a
+  storeroom, and makes a sheet of labels to print.
 * **Ideas** – twelve looks with their palettes, the tips people rate most, and searches on Pinterest,
   Houzz, Behance, Dribbble and Unsplash for your room and look. Photos for the room come straight into
   the app from [Openverse](https://openverse.org) (openly licensed, no account needed) or
