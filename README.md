@@ -30,6 +30,11 @@ arrangement you can carry out one step at a time.
   can get into from both sides, a TV at the right distance, a kitchen work triangle, a balanced room
   with a focal point, and Vaastu's directions as gentle advice or strict rules. Each finding says why it
   matters and what to do, and lights up the pieces on the plan.
+* **Plan from photos** – an AI you choose in Ask AI (a free Gemini key, Anthropic, OpenAI,
+  OpenRouter, or a vision model on your own computer) draws the room from its photos and videos. Photos
+  are made smaller and lose their location and camera details before they are sent; you check every
+  piece before it goes on the plan. Gemini reads a short video as it is; for the others frames are taken
+  from it, which on a computer needs [FFmpeg](https://ffmpeg.org) installed.
 * **Arrange** – Vinyasa tries thousands of arrangements and keeps the one that fixes most for the least
   lifting, moving things that belong together as one. The pieces glide to their new places; keep the
   plan and follow it step by step.
@@ -40,7 +45,8 @@ arrangement you can carry out one step at a time.
   backup first. Settings › Updates goes back to an earlier version.
 * **Problem reports** – write what happened; Vinyasa adds the version history, system, theme and
   recent errors you choose, and opens a GitHub issue for you to send.
-* **Private** – the database is encrypted, photos stay on the device, and sync (through Brahma) is
+* **Private** – the database is encrypted, photos stay on the device unless you send them for a plan,
+  and sync (through Brahma) is
   end-to-end encrypted to your own server.
 
 ## How To Use

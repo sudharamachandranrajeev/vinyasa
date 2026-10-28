@@ -15,6 +15,11 @@
   plans become steps in an order that never puts a piece where another still stands, with tips; ticking
   every step updates the room.
 - Photos and videos of each room, kept on the device.
+- Plan from photos: the AI chosen in Ask AI (Gemini, Anthropic, OpenAI, OpenRouter or a local vision
+  model, with the user's own key) draws the room, its doors, windows and furniture. Photos are shrunk,
+  turned upright and stripped of location and camera details first. Gemini takes short videos whole;
+  otherwise frames are taken (Android's own decoder, or the ffmpeg program on computers). Sizes are
+  scaled to the measured room; unsure pieces start unticked and glow on the plan for checking.
 - Ideas: twelve looks with palettes, the most-loved tips, and searches on Pinterest, Houzz, Behance,
   Dribbble and Unsplash built from the room and the look.
 - Eight themes made for interiors, a theme editor, light and dark, and a calm mode.

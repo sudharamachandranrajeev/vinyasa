@@ -8,14 +8,20 @@ import 'package:path_provider/path_provider.dart';
 
 import '../app/providers.dart';
 import '../db/database.dart';
+import '../domain/space.dart';
 import 'common.dart';
 import 'motion.dart';
+import 'scan_view.dart';
 
 /// A room's photos and videos, copied into the app's own folder so they
-/// stay when the originals move. They never leave this device.
+/// stay when the originals move. They leave this device only when the user
+/// asks for a plan to be made from them (scan_view.dart).
 class PhotosView extends ConsumerWidget {
-  const PhotosView({super.key, required this.roomId});
-  final String roomId;
+  const PhotosView({super.key, required this.room, required this.space});
+  final Room room;
+  final String space;
+
+  String get roomId => room.id;
 
   static const _videoExt = {'mp4', 'mov', 'm4v', 'webm', 'mkv', '3gp', 'avi'};
 
@@ -66,6 +72,14 @@ class PhotosView extends ConsumerWidget {
                       icon: const Icon(Icons.add_a_photo_outlined),
                       label: const Text('Add photos or videos'),
                     ),
+                    if (media.isNotEmpty) ...[
+                      const SizedBox(width: 8),
+                      OutlinedButton.icon(
+                        onPressed: () => startScan(context, ref, room, space),
+                        icon: const Icon(Icons.auto_fix_high_outlined),
+                        label: const Text('Make a plan from these'),
+                      ),
+                    ],
                     const SizedBox(width: 8),
                     Hint(
                       'photos.what',
@@ -76,7 +90,8 @@ class PhotosView extends ConsumerWidget {
                 const SizedBox(height: 8),
                 Text(
                   'Take one photo from each corner, standing, and a slow video turning round from the door. '
-                  'They help you fill in the plan and compare before and after.',
+                  'They help you fill in the plan and compare before and after, and an AI you choose '
+                  'can draw the plan from them.',
                   style: t.textTheme.bodySmall?.copyWith(color: t.colorScheme.onSurfaceVariant),
                 ),
                 const SizedBox(height: 12),

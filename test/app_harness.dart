@@ -36,12 +36,13 @@ class AppHarness {
     });
   }
 
-  Future<void> run() async {
+  /// Starts the app; [client] answers its HTTP (an empty list by default).
+  Future<void> run({http.Client? client}) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: vinyasaOverrides(
           session,
-          client: MockClient((_) async => http.Response('[]', 200)),
+          client: client ?? MockClient((_) async => http.Response('[]', 200)),
           builtInThemes: builtInThemes(),
         ),
         retry: (_, _) => null,

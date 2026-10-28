@@ -4,18 +4,24 @@ import android.app.KeyguardManager
 import android.app.admin.DevicePolicyManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.media.MediaMetadataRetriever
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import androidx.core.content.FileProvider
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 /**
  * Hands vinyasa:// links to Dart (lib/app/links.dart): the camera app opens
  * them when it scans a pairing QR code. Also tells Dart the device's name
  * for the pairing request and what Sentinel asks about the device, and hands
- * an update's APK to the system's installer (lib/domain/update.dart). A fragment activity, which
+ * an update's APK to the system's installer (lib/domain/update.dart), and
+ * takes still frames from a video for reading a room (lib/app/scan_media.dart). A fragment activity, which
  * local_auth needs for the app lock's fingerprint and face prompt.
  */
 class MainActivity : FlutterFragmentActivity() {
@@ -49,6 +55,25 @@ class MainActivity : FlutterFragmentActivity() {
                     result.error("install_failed", error.message, null)
                 }
             }
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "dev.brahma.vinyasa/frames")
+            .setMethodCallHandler { call, result ->
+                val path = call.argument<String>("path")
+                if (call.method != "frames" || path == null) {
+                    result.notImplemented()
+                    return@setMethodCallHandler
+                }
+                val count = call.argument<Int>("count") ?: 8
+                val edge = call.argument<Int>("edge") ?: 1600
+                val main = Handler(Looper.getMainLooper())
+                Thread {
+                    try {
+                        val frames = framesOf(path, count, edge)
+                        main.post { result.success(frames) }
+                    } catch (error: Exception) {
+                        main.post { result.error("frames_failed", error.message, null) }
+                    }
+                }.start()
+            }
         channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "dev.brahma.vinyasa/links").apply {
             setMethodCallHandler { call, result ->
                 when (call.method) {
@@ -77,6 +102,30 @@ class MainActivity : FlutterFragmentActivity() {
                 status == DevicePolicyManager.ENCRYPTION_STATUS_ACTIVE_PER_USER),
             "patched" to Build.VERSION.SECURITY_PATCH.takeIf { it.isNotEmpty() },
         )
+    }
+
+    /** [count] JPEG frames spread evenly through the video, at most [edge] px on the long side. */
+    private fun framesOf(path: String, count: Int, edge: Int): List<ByteArray> {
+        val retriever = MediaMetadataRetriever()
+        try {
+            retriever.setDataSource(path)
+            val lengthMs = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLongOrNull() ?: 0L
+            return (0 until count).mapNotNull { n ->
+                val atUs = lengthMs * 1000 * (2 * n + 1) / (2 * count)
+                retriever.getFrameAtTime(atUs, MediaMetadataRetriever.OPTION_CLOSEST_SYNC)?.let { frame ->
+                    val scale = minOf(1.0, edge.toDouble() / maxOf(frame.width, frame.height))
+                    val small = if (scale < 1.0) {
+                        Bitmap.createScaledBitmap(frame, (frame.width * scale).toInt(), (frame.height * scale).toInt(), true)
+                    } else frame
+                    ByteArrayOutputStream().use { out ->
+                        small.compress(Bitmap.CompressFormat.JPEG, 85, out)
+                        out.toByteArray()
+                    }
+                }
+            }.distinctBy { it.contentHashCode() }
+        } finally {
+            retriever.release()
+        }
     }
 
     override fun onNewIntent(intent: Intent) {

@@ -26,8 +26,9 @@ const vinyasaHints = <String, String>{
       'needed, and moves things that belong together (a bed and its bedside tables) as one.',
   'arrange.steps': 'Tick each step as you go; the ticks are kept with the plan.',
   'photos.what':
-      'Photos and videos stay on this device. With an AI key set in Settings, Vinyasa can read a photo '
-      'and suggest the room’s furniture for you to check.',
+      'Photos and videos stay on this device unless you tap “Make a plan from these”. Then they go, '
+      'smaller and without location data, to the AI chosen in Ask AI’s settings, and the plan it draws '
+      'waits for you to check.',
   'page.spaces':
       'Add a space, then its rooms: size, doors and windows, and the furniture in it. Vinyasa checks the '
       'room against about fifty rules and can rearrange it, step by step.',

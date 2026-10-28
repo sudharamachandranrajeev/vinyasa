@@ -11,6 +11,7 @@ import '../domain/book.dart';
 import '../domain/space.dart';
 import '../domain/themes.dart';
 import '../domain/update.dart';
+import '../domain/vision.dart';
 import '../ui/hints.dart';
 import '../ui/look.dart';
 import 'session.dart';
@@ -24,6 +25,18 @@ final httpClientProvider = Provider<http.Client>((ref) => http.Client());
 /// The self-updater: main() sets it in a release build of the standalone app.
 /// Null in the Brahma suite (which updates itself) and in tests.
 final updaterProvider = Provider<Updater?>((ref) => null);
+
+/// Builds the photo reader for an Ask AI setup, with its key from the
+/// keychain. Tests swap the HTTP client.
+final visionAskerProvider = Provider<Future<VisionAsker> Function(HelpAiSetup)>((ref) {
+  return (setup) async => VisionAsker(
+    setup,
+    key: setup.via.needsKey || setup.via == HelpAi.local
+        ? await ref.read(keyVaultProvider).aiKey(setup.via.name)
+        : null,
+    client: ref.read(httpClientProvider),
+  );
+});
 
 /// What main() and the tests override: the session, under both its own and
 /// its shared type, and the app's identity and hints.

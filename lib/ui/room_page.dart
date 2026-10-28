@@ -125,7 +125,7 @@ class _RoomPageState extends ConsumerState<RoomPage> with SingleTickerProviderSt
                       ? const SizedBox.shrink()
                       : AnalysisView(report: report, onArrange: () => _tabs.animateTo(2)),
                   ArrangeView(room: r, space: widget.space),
-                  PhotosView(roomId: r.id),
+                  PhotosView(room: r, space: widget.space),
                   RoomIdeas(
                     room: r,
                     onLook: (id) => storeRoom(ref, r.copyWith(style: id), widget.space),

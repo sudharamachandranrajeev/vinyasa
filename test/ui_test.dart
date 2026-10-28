@@ -1,4 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:brahma_core/brahma_core.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+import 'package:image/image.dart' as img;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:vinyasa/app/modules.dart';
 import 'package:vinyasa/domain/analysis.dart';
@@ -8,6 +15,7 @@ import 'package:vinyasa/domain/space.dart';
 import 'package:vinyasa/ui/plan_view.dart';
 
 import 'app_harness.dart';
+import 'vision_test.dart' show planJson;
 
 /// An example home with the three sample rooms.
 Future<void> seedHome(SpaceBook book) async {
@@ -85,5 +93,61 @@ void main() {
     final kitchen = await tester.runAsync(() => app.book.room('room2'));
     expect(analyse(kitchen!).overall, greaterThan(analyse(sampleKitchen('x')).overall));
     await app.close();
+  });
+
+  testWidgets('a plan made from a photo is checked, then replaces the room', (tester) async {
+    final app = AppHarness(tester)..desktop();
+    late Directory dir;
+    await app.open(
+      seed: (book) async {
+        await seedHome(book);
+        dir = await Directory.systemTemp.createTemp('vinyasa-scan-');
+        final photo = File('${dir.path}/corner.jpg')
+          ..writeAsBytesSync(img.encodeJpg(img.Image(width: 64, height: 48)));
+        await book.addMedia('room0', photo.path, 'photo');
+      },
+    );
+    await tester.runAsync(() async {
+      await app.session.db.setLocalSetting(
+        'ai.help',
+        jsonEncode(const HelpAiSetup(via: HelpAi.anthropic).toJson()),
+      );
+      await app.session.keys.setAiKey('anthropic', 'test-key');
+    });
+    var calls = 0;
+    await app.run(
+      client: MockClient((r) async {
+        if (r.url.host != 'api.anthropic.com') return http.Response('[]', 200);
+        calls++;
+        return http.Response(
+          jsonEncode({
+            'stop_reason': 'end_turn',
+            'content': [
+              {'type': 'text', 'text': planJson()},
+            ],
+          }),
+          200,
+        );
+      }),
+    );
+    await app.tap(find.text('Bedroom').first);
+    await app.tap(find.widgetWithText(Tab, 'Photos'));
+    await app.tapText('Make a plan from these');
+    expect(find.textContaining('to Anthropic API key'), findsOneWidget);
+    await app.tapText('Send');
+    // The photo is cleaned in an isolate: real time.
+    await tester.runAsync(() => Future<void>.delayed(const Duration(seconds: 2)));
+    await app.settle();
+    expect(calls, 1);
+    expect(find.text('The left wall was hidden.'), findsOneWidget);
+    await app.tapText('Use this plan');
+    await app.tapText('Replace');
+    final room = await tester.runAsync(() => app.book.room('room0'));
+    // The unsure wardrobe starts unticked, so the bed and the piano stay.
+    expect(room!.items.map((i) => i.kind).toList()..sort(), ['bed_double', 'generic']);
+    expect((room.width, room.depth), (3600, 3300));
+    expect(room.name, 'Bedroom');
+    await app.close();
+    await tester.runAsync(() => dir.delete(recursive: true));
   });
 }
