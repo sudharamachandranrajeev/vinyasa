@@ -8,6 +8,7 @@ import '../domain/space.dart';
 import 'look.dart';
 import 'motion.dart';
 import 'plan_view.dart';
+import 'room_3d.dart';
 
 /// The report on a room: the scores, then each finding with why and what
 /// to do; picking a finding lights up the pieces it is about on the plan.
@@ -99,7 +100,7 @@ class _AnalysisViewState extends State<AnalysisView> with SingleTickerProviderSt
       clipBehavior: Clip.antiAlias,
       child: AspectRatio(
         aspectRatio: math.max(1.0, r.room.width / r.room.depth),
-        child: PlanView(
+        child: RoomPicture(
           room: r.room,
           highlight: {...?_picked?.items},
           pulse: _pulse,

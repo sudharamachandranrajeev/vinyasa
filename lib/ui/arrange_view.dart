@@ -13,6 +13,7 @@ import '../domain/steps.dart';
 import 'look.dart';
 import 'motion.dart';
 import 'plan_view.dart';
+import 'room_3d.dart';
 
 /// Rearranging a room: run the planner, watch the pieces glide to their new
 /// places, keep the plan, then follow it step by step.
@@ -133,7 +134,7 @@ class _ArrangeViewState extends ConsumerState<ArrangeView> with SingleTickerProv
             children: [
               AspectRatio(
                 aspectRatio: math.max(1.0, widget.room.width / widget.room.depth),
-                child: PlanView(
+                child: RoomPicture(
                   room: r.room,
                   from: r.before.room,
                   morph: _morph,
@@ -371,7 +372,7 @@ class _StepsPageState extends ConsumerState<StepsPage> with SingleTickerProvider
         aspectRatio: math.max(1.0, now.width / now.depth),
         child: AnimatedSwitcher(
           duration: Motion.medium,
-          child: PlanView(
+          child: RoomPicture(
             key: ValueKey(step.id),
             room: step.kind == StepKind.prepare ? now : arranged,
             highlight: {...step.items},

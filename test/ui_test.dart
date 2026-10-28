@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:brahma_core/brahma_core.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -13,6 +14,7 @@ import 'package:vinyasa/domain/book.dart';
 import 'package:vinyasa/domain/samples.dart';
 import 'package:vinyasa/domain/space.dart';
 import 'package:vinyasa/ui/plan_view.dart';
+import 'package:vinyasa/ui/room_3d.dart';
 
 import 'app_harness.dart';
 import 'vision_test.dart' show planJson;
@@ -65,10 +67,48 @@ void main() {
       expect(find.text('Example home'), findsOneWidget);
       await app.tap(find.text('Bedroom').first);
       expect(find.byType(PlanView), findsWidgets);
-      for (final tab in ['Analysis', 'Arrange', 'Photos', 'Ideas', 'Plan']) {
+      for (final tab in ['3D', 'Analysis', 'Arrange', 'Photos', 'Ideas', 'Plan']) {
         await app.tap(find.widgetWithText(Tab, tab));
         expect(tester.takeException(), isNull, reason: '$tab (phone: $phone)');
       }
+      await app.close();
+    }
+  });
+
+  testWidgets('the 3D view turns, zooms and glides between views; Analysis switches to 3D', (tester) async {
+    for (final phone in [false, true]) {
+      final app = AppHarness(tester);
+      phone ? app.phone() : app.desktop();
+      await app.open();
+      await app.run();
+      await app.tapText('Try an example');
+      await app.tap(find.text('Bedroom').first);
+      await app.tap(find.widgetWithText(Tab, '3D'));
+      final view = find.byType(Room3D);
+      expect(view, findsOneWidget);
+      await tester.drag(view, const Offset(-120, 40));
+      await app.settle();
+      for (final button in ['From above', 'From the door', 'From a corner']) {
+        // Not app.tap: ensureVisible would scroll the tab pages sideways.
+        await tester.tap(find.byTooltip(button));
+        await app.settle();
+        expect(tester.takeException(), isNull, reason: '$button (phone: $phone)');
+      }
+      final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await mouse.addPointer(location: tester.getCenter(view));
+      await tester.sendEventToBinding(
+        PointerScrollEvent(position: tester.getCenter(view), scrollDelta: const Offset(0, 200)),
+      );
+      await app.settle();
+      await mouse.removePointer();
+
+      await app.tap(find.widgetWithText(Tab, 'Analysis'));
+      expect(find.byType(Room3D), findsNothing);
+      await app.tap(find.byTooltip('Show in 3D'));
+      expect(find.byType(Room3D), findsOneWidget);
+      await app.tap(find.byTooltip('Show the plan'));
+      expect(find.byType(Room3D), findsNothing);
+      expect(tester.takeException(), isNull);
       await app.close();
     }
   });

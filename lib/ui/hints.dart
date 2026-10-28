@@ -21,6 +21,9 @@ const vinyasaHints = <String, String>{
   'plan.layers':
       'Clearances show the room each piece needs in front of it. Walkways show where a person can walk '
       'from the door. The Vaastu grid shows the nine zones and their elements.',
+  '3d.how':
+      'Drag to turn the room, pinch or scroll to zoom, and drag with two fingers, the right mouse button or '
+      'Shift held to move it. The walls nearest you are lowered so you can see in.',
   'arrange.how':
       'Vinyasa tries thousands of small changes, keeps those that fix problems without moving more than '
       'needed, and moves things that belong together (a bed and its bedside tables) as one.',

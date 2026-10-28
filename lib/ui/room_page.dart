@@ -12,6 +12,7 @@ import 'look.dart';
 import 'photos_view.dart';
 import 'plan_editor.dart';
 import 'plan_view.dart';
+import 'room_3d.dart';
 import 'room_form.dart';
 
 /// Saves [room] in [space] with its score, so lists show it without
@@ -19,7 +20,7 @@ import 'room_form.dart';
 Future<void> storeRoom(WidgetRef ref, Room room, String space) =>
     ref.mutate((s) => s.book.saveRoom(room, space: space, score: analyse(room).overall));
 
-/// One room: its plan, the report on it, rearranging it, its photos and
+/// One room: its plan, the room in 3D, the report on it, rearranging it, its photos and
 /// ideas for it.
 class RoomPage extends ConsumerStatefulWidget {
   const RoomPage({super.key, required this.roomId, required this.space});
@@ -31,7 +32,7 @@ class RoomPage extends ConsumerStatefulWidget {
 }
 
 class _RoomPageState extends ConsumerState<RoomPage> with SingleTickerProviderStateMixin {
-  late final _tabs = TabController(length: 5, vsync: this);
+  late final _tabs = TabController(length: 6, vsync: this);
 
   @override
   void dispose() {
@@ -95,6 +96,7 @@ class _RoomPageState extends ConsumerState<RoomPage> with SingleTickerProviderSt
           tabAlignment: TabAlignment.start,
           tabs: const [
             Tab(icon: Icon(Icons.grid_view_outlined), text: 'Plan'),
+            Tab(icon: Icon(Icons.view_in_ar_outlined), text: '3D'),
             Tab(icon: Icon(Icons.fact_check_outlined), text: 'Analysis'),
             Tab(icon: Icon(Icons.auto_awesome_outlined), text: 'Arrange'),
             Tab(icon: Icon(Icons.photo_library_outlined), text: 'Photos'),
@@ -121,9 +123,10 @@ class _RoomPageState extends ConsumerState<RoomPage> with SingleTickerProviderSt
                       child: PlanEditor(room: r, onChanged: (x) => storeRoom(ref, x, widget.space)),
                     ),
                   ),
+                  Room3D(room: r, interactive: true),
                   report == null
                       ? const SizedBox.shrink()
-                      : AnalysisView(report: report, onArrange: () => _tabs.animateTo(2)),
+                      : AnalysisView(report: report, onArrange: () => _tabs.animateTo(3)),
                   ArrangeView(room: r, space: widget.space),
                   PhotosView(room: r, space: widget.space),
                   RoomIdeas(

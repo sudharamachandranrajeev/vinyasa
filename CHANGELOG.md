@@ -14,6 +14,12 @@
   (a bed and its bedside tables, a desk and its chair). The pieces glide to their new places. Kept
   plans become steps in an order that never puts a piece where another still stands, with tips; ticking
   every step updates the room.
+- 3D view of each room: walls with their doors and windows, and each kind of piece shaped (a bed with
+  its headboard, a sofa with its back and arms, tables on legs, a lamp with its shade). Drag to turn,
+  pinch or scroll to zoom, two fingers or the right button to move; buttons glide to a corner view, a
+  view from above and the view from the door. The walls nearest the eye lower like a doll's house.
+  Analysis and Arrange can switch their pictures to 3D, where findings glow and kept arrangements glide
+  into place. Drawn on Flutter's own canvas, with no added libraries.
 - Photos and videos of each room, kept on the device.
 - Plan from photos: the AI chosen in Ask AI (Gemini, Anthropic, OpenAI, OpenRouter or a local vision
   model, with the user's own key) draws the room, its doors, windows and furniture. Photos are shrunk,

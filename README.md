@@ -30,6 +30,9 @@ arrangement you can carry out one step at a time.
   can get into from both sides, a TV at the right distance, a kitchen work triangle, a balanced room
   with a focal point, and Vaastu's directions as gentle advice or strict rules. Each finding says why it
   matters and what to do, and lights up the pieces on the plan.
+* **3D** – walk round the room: turn, tilt, zoom and move it, or glide to the view from a corner, from
+  above or from the door. The nearest walls lower so you can see in. Findings and rearrangements show
+  in 3D too. It is drawn by Vinyasa itself, so it needs nothing extra on any system.
 * **Plan from photos** – an AI you choose in Ask AI (a free Gemini key, Anthropic, OpenAI,
   OpenRouter, or a vision model on your own computer) draws the room from its photos and videos. Photos
   are made smaller and lose their location and camera details before they are sent; you check every
