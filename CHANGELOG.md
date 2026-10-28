@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 (unreleased)
+## 0.1.0 (2026-10-28)
 
 - Spaces and rooms: homes, offices, shops, clinics and studios, each with rooms of 18 kinds. A room
   has its size, which way it faces, its doors and windows, its furniture (about 60 kinds with typical
