@@ -1,11 +1,17 @@
 # Changelog
 
-## 0.2.0 (unreleased)
+## 0.2.0 (2026-10-29)
 
 - List from photos on the Storage tab: photograph open cupboards, shelves or drawers and the AI chosen in
   Ask AI lists what they hold, grouped ("winter coats", "cookbooks"), with the sort of thing, a guess
   at how often it is used and whether it is heavy. Unsure guesses start unticked; nothing joins the list
   until checked. Photos are shrunk and stripped of location and camera details first, as for plans.
+- Crash log: errors the app cannot handle are written to the device at once, so they outlive a crash.
+  Each entry has the full stack, the version and system, memory in use, how long the app had run and
+  the pages opened just before. Android crashes outside Dart (a plugin, the engine) are kept too. The
+  home folder, account name and e-mail addresses are taken out. After a run that crashed, the app says
+  so once. Settings › Crash log shows each entry, and copies, saves or clears the log; a problem report
+  can include its newest entries. Nothing is sent from the app.
 
 ## 0.1.0 (2026-10-28)
 

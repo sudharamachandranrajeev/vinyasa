@@ -9,8 +9,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../domain/crash_log.dart';
 import '../domain/update.dart';
 import '../ui/common.dart';
+import 'crash_log_page.dart';
 import 'providers.dart';
 import 'session.dart';
 
@@ -412,6 +414,13 @@ class _ReportCard extends StatelessWidget {
               icon: const Icon(Icons.lightbulb_outline),
               label: const Text('Suggest a feature'),
             ),
+            if (CrashLog.current case final log?)
+              OutlinedButton.icon(
+                onPressed: () =>
+                    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => CrashLogPage(log))),
+                icon: const Icon(Icons.receipt_long_outlined),
+                label: const Text('Crash log'),
+              ),
           ],
         ),
       ],
@@ -422,7 +431,10 @@ class _ReportCard extends StatelessWidget {
 /// The problem report: what happened, the steps, and the diagnostics the
 /// user chooses to include, shown in full before anything leaves.
 class BugReportDialog extends ConsumerStatefulWidget {
-  const BugReportDialog({super.key});
+  const BugReportDialog({super.key, this.withCrashLog = false});
+
+  /// Starts with the crash log ticked, even when this run has met no error.
+  final bool withCrashLog;
 
   @override
   ConsumerState<BugReportDialog> createState() => _BugReportDialogState();
@@ -434,6 +446,8 @@ class _BugReportDialogState extends ConsumerState<BugReportDialog> {
   final _steps = TextEditingController();
   bool _device = true;
   bool _errors = AppErrors.recent.isNotEmpty;
+  final _crashes = CrashLog.current?.entries().length ?? 0;
+  late bool _crashLog = widget.withCrashLog || (CrashLog.current?.unseen().isNotEmpty ?? false);
   String? _room;
   String _version = '';
   String? _roomJson;
@@ -482,6 +496,14 @@ class _BugReportDialogState extends ConsumerState<BugReportDialog> {
     final extra = [
       if (_device) ...['### Device', _diagnostics()],
       if (_roomJson != null) ...['', '### Room', '```json', _roomJson!, '```'],
+      // The newest few: the whole log would not fit in an issue.
+      if (_crashLog && _crashes > 0) ...[
+        '',
+        '### Crash log',
+        '```text',
+        CrashLog.current!.report(limit: 3),
+        '```',
+      ],
     ].join('\n');
     return reportBody(
       kind: ReportKind.bug,
@@ -567,6 +589,16 @@ class _BugReportDialogState extends ConsumerState<BugReportDialog> {
               value: _errors,
               onChanged: AppErrors.recent.isEmpty ? null : (v) => setState(() => _errors = v ?? false),
             ),
+            if (_crashes > 0)
+              CheckboxListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text('Include the crash log'),
+                subtitle: Text(
+                  'The newest ${_crashes < 3 ? _crashes : 3} of $_crashes entries, with their full stack.',
+                ),
+                value: _crashLog,
+                onChanged: (v) => setState(() => _crashLog = v ?? false),
+              ),
             DropdownButtonFormField<String?>(
               initialValue: _room,
               decoration: const InputDecoration(labelText: 'Attach a room’s plan (optional)'),

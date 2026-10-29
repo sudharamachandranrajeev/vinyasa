@@ -30,7 +30,7 @@
 *Vinyāsa* is Sanskrit for "arrangement, placing with care". Vinyasa is for anyone setting up a
 room: a bedroom, a kitchen, an office or a shop floor. It checks the room against rules from
 ergonomics, accessibility, interior design and Vaastu, then finds a better layout you can follow
-one step at a time. Status: **early** (0.1.0, a pre-release). Sizes come from what you enter, so
+one step at a time. Status: **early** (0.2.0, a pre-release). Sizes come from what you enter, so
 measure carefully.
 
 ## ✨ What it does
@@ -49,7 +49,8 @@ measure carefully.
 - 📐 **Will it fit?** – before you buy, give a piece's size. Vinyasa shows the three best places for
   it and checks it gets through the door.
 - 🗄️ **Storage** – list what your wardrobes and shelves hold, and Vinyasa says which shelf each
-  thing belongs on, with labels to print.
+  thing belongs on, with labels to print. Or photograph the open cupboards and let the AI write the
+  list for you.
 - 📷 **Plan from photos** (optional) – an AI you choose reads photos or a short video of the room and
   draws it. You check every piece first.
 - 💡 **Ideas** – twelve looks with colour palettes, openly licensed photos, and a moodboard per room.
@@ -68,8 +69,8 @@ measure carefully.
 | Themes | Eight themes made for interiors, your own in the theme editor, light and dark |
 | Updates | From GitHub releases, checked against SHA-256 sums, with a backup first. You can go back a version |
 | Problem reports | Opens a GitHub issue with the details you choose to include |
+| Crash log | Every error the app could not handle, kept on the device with full details, to read or attach to a report |
 | Backup | Every space, room and plan in one file. Sync and app lock come from Brahma |
-| Next release | **List from photos** on the Storage tab: photograph open cupboards and the AI lists what they hold |
 
 </details>
 
@@ -207,6 +208,9 @@ flowchart LR
   end-to-end encrypted (only your devices can read it).
 - **Back up**: **Settings → Backup → Save a backup** writes every space, room and plan to one
   file. **Restore** brings it back.
+- **Crash log**: errors stay on the device, in the `crashes` folder inside the data folder. Your
+  home folder, account name and e-mail addresses are left out. They leave only if you send a problem
+  report.
 - **Delete**: uninstall the app, then delete the data folder above.
 
 > [!IMPORTANT]
@@ -252,8 +256,22 @@ matters to you, when you edit the room.
 <details>
 <summary><b>How do I go back to an older version?</b></summary>
 
-Open **Settings → Go back to an earlier version**. On Android, Vinyasa makes a backup first, then
-opens the release page.
+1. Open **Settings → Updates → Go back to an earlier version** and pick one.
+2. On Linux and Windows, Vinyasa backs up your data and installs it in place. That version is not
+   offered again when the app starts; a newer one is.
+3. On Android, the phone will not install an older version over a newer one. Vinyasa saves your
+   data to a file you choose and opens the release page. Uninstall Vinyasa, install the older APK,
+   then use **Settings → Backup → Restore** with that file.
+</details>
+
+<details>
+<summary><b>Vinyasa crashed. How do I report it?</b></summary>
+
+1. Start Vinyasa again. It tells you it met an error last time; tap **See**. (Or open
+   **Settings → Crash log**.)
+2. Tap **Report a problem with it**. The newest crash details are already ticked.
+3. Say what you were doing, read the whole report, then choose **Open on GitHub**, **Copy** or
+   **Save**. Nothing is sent until you submit it on GitHub.
 </details>
 
 ## 🛠️ For developers

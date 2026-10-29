@@ -7,6 +7,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.os.Build
+import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.core.content.FileProvider
@@ -23,10 +24,55 @@ import java.io.File
  * an update's APK to the system's installer (lib/domain/update.dart), and
  * takes still frames from a video for reading a room (lib/app/scan_media.dart). A fragment activity, which
  * local_auth needs for the app lock's fingerprint and face prompt.
+ * Writes crashes outside Dart to the crash log (lib/domain/crash_log.dart).
  */
 class MainActivity : FlutterFragmentActivity() {
     private var channel: MethodChannel? = null
     private var pending: String? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        keepNativeCrashes()
+        super.onCreate(savedInstanceState)
+    }
+
+    /**
+     * A crash in Android's own code (a plugin, the engine) never reaches Dart:
+     * write it as filesDir/crashes/crash-<utc millis>-native.txt, the format
+     * Dart's crash log reads, then let Android end the app as before.
+     */
+    private fun keepNativeCrashes() {
+        val before = Thread.getDefaultUncaughtExceptionHandler()
+        if (before is NativeCrashes) return
+        Thread.setDefaultUncaughtExceptionHandler(NativeCrashes(File(filesDir, "crashes"), before))
+    }
+
+    private class NativeCrashes(
+        private val dir: File,
+        private val before: Thread.UncaughtExceptionHandler?,
+    ) : Thread.UncaughtExceptionHandler {
+        override fun uncaughtException(thread: Thread, error: Throwable) {
+            try {
+                dir.mkdirs()
+                val now = System.currentTimeMillis()
+                val stack = java.io.StringWriter().also { error.printStackTrace(java.io.PrintWriter(it)) }.toString()
+                File(dir, "crash-$now-native.txt").writeText(
+                    listOf(
+                        "Time: ${java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.ROOT).apply { timeZone = java.util.TimeZone.getTimeZone("UTC") }.format(java.util.Date(now))}",
+                        "Kind: native",
+                        "System: Android ${Build.VERSION.RELEASE} (API ${Build.VERSION.SDK_INT}), ${Build.MANUFACTURER} ${Build.MODEL}",
+                        "Thread: ${thread.name}",
+                        "Error type: ${error.javaClass.name}",
+                        "Error: ${error.message ?: error.javaClass.simpleName}",
+                        "",
+                        "Stack:",
+                        stack.lines().take(150).joinToString("\n") { "  $it" },
+                    ).joinToString("\n")
+                )
+            } catch (_: Throwable) {
+            }
+            before?.uncaughtException(thread, error)
+        }
+    }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)

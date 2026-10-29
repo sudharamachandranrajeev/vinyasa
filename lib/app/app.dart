@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../ui/look.dart';
+import '../domain/crash_log.dart';
+import 'crash_log_page.dart';
 import 'modules.dart';
 import 'providers.dart';
 import 'settings_page.dart';
@@ -27,6 +29,7 @@ class VinyasaApp extends ConsumerWidget {
     darkTheme: chosenTheme(ref, Brightness.dark),
     themeMode: chosenMode(ref),
     builder: (context, child) => AppLockGate(child: Backdrop(child: child ?? const SizedBox.shrink())),
+    navigatorObservers: [CrashTrail()],
     home: home,
   );
 }
@@ -41,10 +44,22 @@ class _Root extends ConsumerStatefulWidget {
 }
 
 class _RootState extends ConsumerState<_Root> {
+  late final _life = AppLifecycleListener(onStateChange: (s) => CrashLog.current?.note('app ${s.name}'));
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _offerUpdate().ignore());
+    _life;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      offerCrashLog(context);
+      _offerUpdate().ignore();
+    });
+  }
+
+  @override
+  void dispose() {
+    _life.dispose();
+    super.dispose();
   }
 
   Future<void> _offerUpdate() async {

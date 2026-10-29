@@ -63,8 +63,16 @@ void main() {
           jsonEncode([
             for (final h in ['spaces', 'ideas', 'themes', 'settings']) 'nav.$h',
             for (final h in ['spaces', 'ideas', 'themes']) 'page.$h',
-            'room.score', 'room.weights', 'room.north', 'room.vaastu', 'plan.drag', 'plan.layers',
-            'storage.how', 'arrange.how', 'arrange.steps', 'photos.what',
+            'room.score',
+            'room.weights',
+            'room.north',
+            'room.vaastu',
+            'plan.drag',
+            'plan.layers',
+            'storage.how',
+            'arrange.how',
+            'arrange.steps',
+            'photos.what',
           ]),
         ),
       );

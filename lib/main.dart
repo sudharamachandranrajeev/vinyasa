@@ -11,12 +11,51 @@ import 'package:path_provider/path_provider.dart';
 import 'app/app.dart';
 import 'app/providers.dart';
 import 'app/session.dart';
+import 'domain/crash_log.dart';
 import 'domain/update.dart';
 import 'ui/look.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await _openCrashLog();
   await _start();
+}
+
+/// Opened first, so a failing start is logged too. Uncaught errors go to
+/// the log after whatever handled them before.
+Future<void> _openCrashLog() async {
+  try {
+    final info = await PackageInfo.fromPlatform();
+    final log = CrashLog.current = CrashLog(
+      Directory('${(await getApplicationSupportDirectory()).path}${Platform.pathSeparator}crashes'),
+      facts: {
+        'App':
+            'Vinyasa ${info.version} (build ${info.buildNumber}, '
+            '${kReleaseMode
+                ? 'release'
+                : kProfileMode
+                ? 'profile'
+                : 'debug'})',
+        'System': '${Platform.operatingSystem} ${Platform.operatingSystemVersion}',
+        'Dart': Platform.version.split(' ').first,
+        'Processors': '${Platform.numberOfProcessors}',
+        'Locale': Platform.localeName,
+      },
+    );
+    final flutter = FlutterError.onError;
+    FlutterError.onError = (details) {
+      log.record(details.exception, details.stack, kind: 'flutter', context: details.context?.toString());
+      flutter?.call(details);
+    };
+    final platform = PlatformDispatcher.instance.onError;
+    PlatformDispatcher.instance.onError = (error, stack) {
+      log.record(error, stack, kind: 'uncaught');
+      return platform?.call(error, stack) ?? false;
+    };
+    log.note('started');
+  } catch (e) {
+    debugPrint('Vinyasa crash log not opened: $e');
+  }
 }
 
 Future<void> _start() async {
@@ -40,7 +79,8 @@ Future<void> _start() async {
         child: const VinyasaApp(),
       ),
     );
-  } catch (e) {
+  } catch (e, stack) {
+    CrashLog.current?.record(e, stack, kind: 'startup');
     // Also in release builds' logs, where smoke tests look for it.
     debugPrint('Vinyasa startup failed: $e');
     runApp(

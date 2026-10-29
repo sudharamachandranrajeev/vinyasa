@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 /// A page that fades in while it grows from 94% and rises 24 px, and the
 /// page below sinks back a little.
 Route<T> fluidRoute<T>(Widget page) => PageRouteBuilder<T>(
+  // Named after the page, for the crash log's "just before".
+  settings: RouteSettings(name: '${page.runtimeType}'),
   transitionDuration: const Duration(milliseconds: 420),
   reverseTransitionDuration: const Duration(milliseconds: 300),
   pageBuilder: (_, _, _) => page,
