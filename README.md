@@ -6,89 +6,310 @@
   <br>
 </h1>
 
-<h4 align="center">A space organiser for homes, offices and shops: plan a room, see what is wrong with it, and rearrange it step by step.</h4>
+<h4 align="center">Plan any room, see what is wrong with it, and rearrange it step by step: at home, at work or in a shop.</h4>
 
 <p align="center">
-  <a href="https://github.com/sudharamachandranrajeev/vinyasa/releases"><img src="https://img.shields.io/github/v/release/sudharamachandranrajeev/vinyasa?include_prereleases&color=b5562f" alt="Release"></a>
-  <img src="https://img.shields.io/badge/platforms-Linux%20%7C%20Windows%20%7C%20Android-555" alt="Platforms">
-  <img src="https://img.shields.io/badge/Flutter-3.47-02569B?logo=flutter" alt="Flutter">
-  <img src="https://img.shields.io/badge/part%20of-Brahma-8a5cf6" alt="Part of Brahma">
+  <a href="https://github.com/sudharamachandranrajeev/vinyasa/releases"><img src="https://img.shields.io/github/v/release/sudharamachandranrajeev/vinyasa?include_prereleases&color=b5562f&label=download" alt="Latest release"></a>
+  <img src="https://img.shields.io/badge/works%20on-Linux%20%7C%20Windows%20%7C%20Android-555" alt="Works on Linux, Windows and Android">
+  <img src="https://img.shields.io/badge/license-MIT-2e7d32" alt="MIT licence">
+  <a href="https://github.com/sudharamachandranrajeev/brahma"><img src="https://img.shields.io/badge/part%20of-Brahma-8a5cf6" alt="Part of Brahma"></a>
 </p>
 
-## Key Features
+<p align="center">
+  <a href="#-what-it-does">What it does</a> •
+  <a href="#-get-started">Get started</a> •
+  <a href="#-how-it-works">How it works</a> •
+  <a href="#-faq-and-troubleshooting">FAQ</a> •
+  <a href="#%EF%B8%8F-for-developers">For developers</a>
+</p>
 
-*Vinyāsa* is Sanskrit for "arrangement, placing with care". Vinyasa checks a room against rules from
-ergonomics, accessibility, interior design and Vaastu Shastra, scores it, and finds a better
-arrangement you can carry out one step at a time.
+<p align="center">
+  <img src="docs/screenshots/hero.png" alt="A living room in Vinyasa's 3D view on a desktop window" width="100%">
+</p>
 
-* **Spaces and rooms** – a home, an office, a shop or a clinic, each with its rooms. A room has its
-  size, which way it faces, its doors and windows, its furniture and who uses it (a wheelchair user,
-  older people, young children, left-handed people).
-* **Plan** – drag pieces into place, turn and resize them, and lay clearances, walkways from the door
-  or the Vaastu grid over the plan.
-* **Analysis** – about 45 rules: walkways at least 900 mm, room to open doors and drawers, a bed you
-  can get into from both sides, a TV at the right distance, a kitchen work triangle, a balanced room
-  with a focal point, and Vaastu's directions as gentle advice or strict rules. Each finding says why it
-  matters and what to do, and lights up the pieces on the plan.
-* **3D** – walk round the room: turn, tilt, zoom and move it, or glide to the view from a corner, from
-  above or from the door. The nearest walls lower so you can see in. Findings and rearrangements show
-  in 3D too. It is drawn by Vinyasa itself, so it needs nothing extra on any system.
-* **Plan from photos** – an AI you choose in Ask AI (a free Gemini key, Anthropic, OpenAI,
-  OpenRouter, or a vision model on your own computer) draws the room from its photos and videos. Photos
-  are made smaller and lose their location and camera details before they are sent; you check every
-  piece before it goes on the plan. Gemini reads a short video as it is; for the others frames are taken
-  from it, which on a computer needs [FFmpeg](https://ffmpeg.org) installed.
-* **Arrange** – Vinyasa tries thousands of arrangements and keeps the one that fixes most for the least
-  lifting, moving things that belong together as one. The pieces glide to their new places; keep the
-  plan and follow it step by step.
-* **Will it fit?** – before you buy, give a piece's size: Vinyasa finds the best places for it in the
-  room, shows what each does to the score, and checks it gets through the door.
-* **Storage** – list what your wardrobes, shelves and cabinets hold and Vinyasa says which shelf each
-  thing goes on: everyday things at easy reach near the door, heavy things low, rare things out of the
-  way, with reach set by who uses the room. It follows KonMari at home, 5S at work and ABC slotting in a
-  storeroom, and makes a sheet of labels to print. Photos of open cupboards can fill the list for you,
-  read by the AI you chose in Ask AI.
-* **Ideas** – twelve looks with their palettes, the tips people rate most, and searches on Pinterest,
-  Houzz, Behance, Dribbble and Unsplash for your room and look. Photos for the room come straight into
-  the app from [Openverse](https://openverse.org) (openly licensed, no account needed) or
-  [Unsplash](https://unsplash.com) (with your own free access key), each with its creator and licence.
-  Pin the ones you like to the room's moodboard.
-* **Themes** – eight themes made for interiors, your own in the theme editor, light and dark.
-* **Updates and going back** – updates install from GitHub releases after their checksums match, with a
-  backup first. Settings › Updates goes back to an earlier version.
-* **Problem reports** – write what happened; Vinyasa adds the version history, system, theme and
-  recent errors you choose, and opens a GitHub issue for you to send.
-* **Private** – the database is encrypted, photos stay on the device unless you send them for a plan,
-  and sync (through Brahma) is
-  end-to-end encrypted to your own server.
+*Vinyāsa* is Sanskrit for "arrangement, placing with care". Vinyasa is for anyone setting up a
+room: a bedroom, a kitchen, an office or a shop floor. It checks the room against rules from
+ergonomics, accessibility, interior design and Vaastu, then finds a better layout you can follow
+one step at a time. Status: **early** (0.1.0, a pre-release). Sizes come from what you enter, so
+measure carefully.
 
-## How To Use
+## ✨ What it does
 
-1. Open **Spaces** and add a space, or tap **Try an example**.
-2. Add a room: its name, use, size and which way the top wall faces.
-3. On **Plan**, add furniture, doors and windows and drag them where they are.
-4. **Analysis** shows the scores and what to fix. **Arrange** finds a better layout; keep it and tick
-   the steps as you move things.
+- 🏠 **Spaces and rooms** – a home, office, shop, clinic or studio, each with its rooms: size,
+  which way it faces, doors, windows, furniture, and who uses it (a wheelchair user, older people,
+  young children).
+- ✏️ **Draw the plan** – drag about 60 kinds of furniture into place, turn and resize them, and show
+  clearances, walkways from the door or the Vaastu grid.
+- 🔍 **See what is wrong** – about 45 rules, such as walkways at least 900 mm wide, room to open
+  doors and drawers, and a kitchen work triangle. Each finding says why it matters and what to do.
+- ✨ **A better arrangement** – Vinyasa tries thousands of layouts and keeps the one that fixes most
+  for the least lifting. Keep it and tick off the steps as you move things.
+- 🧊 **Walk round it in 3D** – turn, tilt and zoom, or jump to the view from the door. The nearest
+  walls lower so you can see in.
+- 📐 **Will it fit?** – before you buy, give a piece's size. Vinyasa shows the three best places for
+  it and checks it gets through the door.
+- 🗄️ **Storage** – list what your wardrobes and shelves hold, and Vinyasa says which shelf each
+  thing belongs on, with labels to print.
+- 📷 **Plan from photos** (optional) – an AI you choose reads photos or a short video of the room and
+  draws it. You check every piece first.
+- 💡 **Ideas** – twelve looks with colour palettes, openly licensed photos, and a moodboard per room.
 
-## Download
+<details>
+<summary><b>Everything else</b></summary>
 
-Releases for Android (APK), Windows (installer or portable zip) and Linux (tarball with `install.sh`)
-are on the [releases page](https://github.com/sudharamachandranrajeev/vinyasa/releases).
+| Feature | Details |
+| --- | --- |
+| Vaastu | Off, gentle (advice) or strict (weighs more in the score), for each room |
+| Scores | Space, access, comfort, look and Vaastu, weighed by what matters in that room |
+| Storage methods | KonMari order at home, 5S at work, ABC slotting in a storeroom |
+| Idea searches | Pinterest, Houzz, Behance, Dribbble and Unsplash, built from the room and look |
+| Idea photos | [Openverse](https://openverse.org) (no account) or [Unsplash](https://unsplash.com) (your own free key) |
+| AI for photos | Gemini (free key), Anthropic, OpenAI, OpenRouter, or a vision model on your own computer |
+| Themes | Eight themes made for interiors, your own in the theme editor, light and dark |
+| Updates | From GitHub releases, checked against SHA-256 sums, with a backup first. You can go back a version |
+| Problem reports | Opens a GitHub issue with the details you choose to include |
+| Backup | Every space, room and plan in one file. Sync and app lock come from Brahma |
+| Next release | **List from photos** on the Storage tab: photograph open cupboards and the AI lists what they hold |
 
-## Building
+</details>
+
+## 📸 Screenshots
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/spaces-light.png" alt="Spaces page with an example home of three rooms" width="220"><br><sub>Your spaces</sub></td>
+    <td align="center"><img src="docs/screenshots/plan-light.png" alt="Plan of a bedroom" width="220"><br><sub>Plan</sub></td>
+    <td align="center"><img src="docs/screenshots/analysis-light.png" alt="Analysis scores for a bedroom" width="220"><br><sub>Analysis</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="docs/screenshots/arrange-light.png" alt="A better arrangement, score 87 to 93" width="220"><br><sub>Arrange</sub></td>
+    <td align="center"><img src="docs/screenshots/3d-light.png" alt="Bedroom in 3D" width="220"><br><sub>3D view</sub></td>
+    <td align="center"><img src="docs/screenshots/plan-dark.png" alt="Plan of a bedroom in dark mode" width="220"><br><sub>Plan (dark)</sub></td>
+  </tr>
+</table>
+
+<p align="center">
+  <img src="docs/screenshots/plan-desktop.png" alt="Plan of a living room on a desktop window" width="80%"><br>
+  <sub>Plan on a desktop window</sub>
+</p>
+
+<sub>All screenshots show the app's built-in example home, rendered from the current code.</sub>
+
+## 🚀 Get started
+
+### Step 1 – Download
+
+Open the [releases page](https://github.com/sudharamachandranrajeev/vinyasa/releases) and, under
+the newest release, pick the file for your device:
+
+| Your device | File to download | Works on |
+| --- | --- | --- |
+| 🐧 Linux computer | `Vinyasa-<version>-linux-x64.tar.gz` | Ubuntu 24.04, Fedora, Arch and similar (Intel/AMD 64-bit) |
+| 🪟 Windows computer | `Vinyasa-<version>-windows-x64-setup.exe` | Windows 10 (version 1809) and 11, 64-bit |
+| 🤖 Android phone or tablet | `Vinyasa-<version>-android.apk` | Android 7 and newer |
+
+Each release also has `SHA256SUMS.txt`, a list of fingerprints to check the files are genuine.
+
+### Step 2 – Install
+
+<details>
+<summary><b>🐧 Linux</b></summary>
+
+1. Open a terminal in the folder where the download landed.
+2. Unpack it and run the installer as your normal user (not `sudo`):
+   ```sh
+   tar -xzf Vinyasa-*-linux-x64.tar.gz
+   cd vinyasa-*-linux-x64 && ./install.sh
+   ```
+3. Open **Vinyasa** from your app menu.
+
+Vinyasa needs GTK 3, libsecret and a running keyring (GNOME Keyring or KWallet), which holds the
+key to your data. The installer warns if one is missing. To remove the app later, run
+`./install.sh --uninstall` from the same folder; your data stays.
+
+</details>
+
+<details>
+<summary><b>🪟 Windows</b></summary>
+
+1. Double-click `Vinyasa-<version>-windows-x64-setup.exe`. No admin rights needed.
+2. Windows may say *"Windows protected your PC"*. This appears because the app isn't paid-signed
+   yet, not because it is harmful. Click **More info → Run anyway**.
+3. Follow the installer, then open **Vinyasa** from the Start menu.
+
+Prefer no installer? Download `…-windows-x64-portable.zip`, unzip it anywhere and run `vinyasa.exe`.
+
+</details>
+
+<details>
+<summary><b>🤖 Android</b></summary>
+
+1. Open the downloaded `.apk` on your phone.
+2. If Android asks, allow installs from your browser or file manager. This is normal for apps
+   from outside the Play Store.
+3. Tap **Install**, then **Open**.
+
+Newer versions install over the top and keep your data.
+
+</details>
+
+### Step 3 – First launch
+
+1. Vinyasa asks where your data should live. Pick **Keep everything on this device** to start.
+   You can turn on sync later in **Settings**.
+2. On **Spaces**, tap **Try an example** to explore a ready-made home, or **Add a space** for your
+   own.
+3. In your space, choose **Add a room**: its name, use, size and which way the top wall faces.
+4. On the room's **Plan** tab, tap **Furniture** and **Door or window**, then drag each piece to
+   where it stands.
+5. Open **Analysis** to see the scores and what to fix.
+6. Open **Arrange** and tap **Find a better arrangement**. Like it? Tap **Keep and show steps** and
+   tick each step as you move things.
+
+### Step 4 (optional) – Plan from photos
+
+1. On the room's **Photos** tab, tap **Add photos or videos**.
+2. Tap **Make a plan from these**. The first time, Vinyasa asks you to **Set up Ask AI**: pick a
+   provider and paste your own key.
+3. Check each piece it found, then tap **Use this plan**.
+
+On a computer, reading a video with any AI other than Gemini needs [FFmpeg](https://ffmpeg.org)
+installed.
+
+### Step 5 (optional) – Use it on more than one device
+
+Open **Settings → Sync → Set up sync** and follow the steps. You need a Brahma
+sync server, at home or on Cloudflare's free plan;
+[Adisthanam](https://github.com/sudharamachandranrajeev/adisthanam) sets one up at home.
+
+## 🧭 How it works
+
+```mermaid
+flowchart LR
+    Y["✏️ You enter the room<br/>or add photos"] --> R["📐 Room model<br/>sizes, doors, furniture"]
+    A["🤖 Your chosen AI<br/>(optional)"] -.->|"reads photos"| R
+    R --> C["🔍 About 45 rules<br/>score the room"]
+    C --> P["✨ Better layout<br/>step by step"]
+```
+
+- **Every score and arrangement** is worked out on your device. No account is needed.
+- **The AI is optional.** It only turns photos into a room. The rules always run without it.
+- **Photos go out only when you ask** for a plan from them. They are made smaller first and lose
+  their location and camera details.
+- **The rules and their sources** are listed in [Vinyasa's rules](docs/rules.md).
+
+## 🔒 Your data
+
+- **Where it lives**: in an encrypted database on the device. Linux:
+  `~/.local/share/dev.brahma.vinyasa`. Windows: under `%APPDATA%`. Android: inside the app.
+- **What leaves the device**: update checks on GitHub, idea searches you tap, photo searches on
+  Openverse or Unsplash, photos you send for a plan, and sync if you turn it on. Sync is
+  end-to-end encrypted (only your devices can read it).
+- **Back up**: **Settings → Backup → Save a backup** writes every space, room and plan to one
+  file. **Restore** brings it back.
+- **Delete**: uninstall the app, then delete the data folder above.
+
+> [!IMPORTANT]
+> On Android, uninstalling the app deletes its data. Save a backup, or turn on sync, first.
+
+## ❓ FAQ and troubleshooting
+
+<details>
+<summary><b>Do I need an account or the internet?</b></summary>
+
+No. Vinyasa works fully offline on one device. You only need the internet for updates, idea photos,
+plans from photos, and sync.
+</details>
+
+<details>
+<summary><b>Windows says the app might be unsafe</b></summary>
+
+The build isn't code-signed (a paid certificate). Click **More info → Run anyway**. Check the file
+against `SHA256SUMS.txt` on the release if you want to be sure it is genuine.
+</details>
+
+<details>
+<summary><b>Linux: Vinyasa does not start, or talks about a keyring</b></summary>
+
+The key that unlocks your data lives in the desktop keyring. Install libsecret and GNOME Keyring
+(or KWallet), make sure the keyring is running and unlocked, then start Vinyasa again.
+</details>
+
+<details>
+<summary><b>Does Plan from photos cost money?</b></summary>
+
+It uses your own key, so any cost is billed by that provider. A Gemini key is free, and a vision
+model on your own computer costs nothing.
+</details>
+
+<details>
+<summary><b>Is Vaastu forced on me?</b></summary>
+
+No. For each room, Vaastu is gentle advice by default. Turn it off, or make it strict if it
+matters to you, when you edit the room.
+</details>
+
+<details>
+<summary><b>How do I go back to an older version?</b></summary>
+
+Open **Settings → Go back to an earlier version**. On Android, Vinyasa makes a backup first, then
+opens the release page.
+</details>
+
+## 🛠️ For developers
+
+<details>
+<summary>Build from source, test and release</summary>
+
+You need [Git](https://git-scm.com) and [Flutter](https://flutter.dev) 3.47.
 
 ```bash
+git clone https://github.com/sudharamachandranrajeev/vinyasa
+cd vinyasa
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs
-flutter test
-flutter run -d linux
+flutter run -d linux        # or windows, or an Android device
+
+flutter analyze && flutter test                                           # check and test
+VINYASA_SHOTS=/tmp/vinyasa-shots flutter test test/screenshots_test.dart  # render the screenshots
+scripts/make-icons.sh                                                     # app icons from branding/vinyasa.svg
 ```
+
+- CI runs everything on each push. A `v*` tag builds, smoke-tests and publishes the Android,
+  Windows and Linux builds (`.github/workflows/release.yml`).
+- Every rule's numbers and sources: [docs/rules.md](docs/rules.md). Changes per version:
+  [CHANGELOG.md](CHANGELOG.md).
+
+</details>
+
+<details>
+<summary>Credits</summary>
+
+- [Flutter](https://flutter.dev), [Riverpod](https://riverpod.dev) and [drift](https://drift.simonbinder.eu)
+  over [SQLite3MultipleCiphers](https://utelle.github.io/SQLite3MultipleCiphers/) for the encrypted
+  database
+- [Inter](https://rsms.me/inter/) and [Plus Jakarta Sans](https://github.com/tokotype/PlusJakartaSans) fonts
+- [Openverse](https://openverse.org) and [Unsplash](https://unsplash.com) for idea photos
+- [FFmpeg](https://ffmpeg.org) for video frames on computers
+
+</details>
 
 ## Related
 
-Vinyasa is one of the [Brahma](https://github.com/sudharamachandranrajeev/brahma) apps and shares its
-core: sync, app lock, Sentinel and the app shell.
+Vinyasa is one app in the **Brahma** family. They share one sign-in and one sync server.
+
+| App | What it does |
+| --- | --- |
+| [brahma](https://github.com/sudharamachandranrajeev/brahma) | The shared core and the all-in-one app |
+| [adisthanam](https://github.com/sudharamachandranrajeev/adisthanam) | Your own sync server, set up with one command |
+| [artha](https://github.com/sudharamachandranrajeev/artha) | Money, accounts and investments |
+| [graha-anveshana](https://github.com/sudharamachandranrajeev/graha-anveshana) | Find a home to rent or buy |
+| [vidya](https://github.com/sudharamachandranrajeev/vidya) | Learning, flashcards and focus |
 
 ## License
 
-MIT
+[MIT](LICENSE)
+
+---
+
+> GitHub [@sudharamachandranrajeev](https://github.com/sudharamachandranrajeev)
