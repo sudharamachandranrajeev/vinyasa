@@ -18,7 +18,7 @@ import 'package:vinyasa/ui/room_3d.dart';
 
 import 'app_harness.dart';
 import 'photos_test.dart' show openverseJson;
-import 'vision_test.dart' show planJson;
+import 'vision_test.dart' show planJson, storageJson;
 
 /// An example home with the three sample rooms.
 Future<void> seedHome(SpaceBook book) async {
@@ -241,6 +241,56 @@ void main() {
       expect(tester.takeException(), isNull, reason: 'phone: $phone');
       await app.close();
     }
+  });
+
+  testWidgets('things seen in a photo of a wardrobe are checked, then join the storage list', (tester) async {
+    final app = AppHarness(tester)..desktop();
+    late Directory dir;
+    await app.open(
+      seed: (book) async {
+        await seedHome(book);
+        dir = await Directory.systemTemp.createTemp('vinyasa-store-');
+        final photo = File('${dir.path}/wardrobe.jpg')
+          ..writeAsBytesSync(img.encodeJpg(img.Image(width: 64, height: 48)));
+        await book.addMedia('room0', photo.path, 'photo');
+      },
+    );
+    await tester.runAsync(() async {
+      await app.session.db.setLocalSetting(
+        'ai.help',
+        jsonEncode(const HelpAiSetup(via: HelpAi.anthropic).toJson()),
+      );
+      await app.session.keys.setAiKey('anthropic', 'test-key');
+    });
+    await app.run(
+      client: MockClient((r) async {
+        if (r.url.host != 'api.anthropic.com') return http.Response('[]', 200);
+        return http.Response(
+          jsonEncode({
+            'stop_reason': 'end_turn',
+            'content': [
+              {'type': 'text', 'text': storageJson()},
+            ],
+          }),
+          200,
+        );
+      }),
+    );
+    await app.tap(find.text('Bedroom').first);
+    await app.tap(find.widgetWithText(Tab, 'Storage'));
+    await app.tapText('List from photos');
+    expect(find.text('List what is stored'), findsOneWidget);
+    await app.tapText('Send');
+    await tester.runAsync(() => Future<void>.delayed(const Duration(seconds: 2)));
+    await app.settle();
+    expect(find.text('The top shelf was dark.'), findsOneWidget);
+    await app.tapText('Add these to the list');
+    final room = await tester.runAsync(() => app.book.room('room0'));
+    // The unsure toolbox starts unticked.
+    expect(room!.things.map((t) => t.name), ['Winter coats']);
+    expect(find.text('Where things go'), findsOneWidget);
+    await app.close();
+    await tester.runAsync(() => dir.delete(recursive: true));
   });
 
   testWidgets('a piece to buy is tried in the room and put on the plan', (tester) async {

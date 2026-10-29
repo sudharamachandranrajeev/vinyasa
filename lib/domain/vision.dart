@@ -17,6 +17,7 @@ import 'package:http/http.dart' as http;
 
 import 'catalog.dart';
 import 'space.dart';
+import 'stored.dart';
 
 /// A photo or a video ready to send: JPEG photos already resized and
 /// stripped of their metadata.
@@ -171,6 +172,15 @@ String _ask(KnownSize known, int images, bool video) {
   ].join(' ');
 }
 
+/// One question about some pictures: the instructions, the request and the
+/// JSON shape the answer must take.
+class _Question {
+  const _Question(this.system, this.prompt, this.schema, this.name);
+  final String system, prompt;
+  final Map<String, Object?> schema;
+  final String name;
+}
+
 /// Sends the media to the chosen AI and reads back a draft. [key] is the
 /// keychain's key for providers that need one.
 class VisionAsker {
@@ -183,6 +193,33 @@ class VisionAsker {
   static const _timeout = Duration(minutes: 3);
 
   Future<RoomDraft> read(Room room, List<VisionMedia> media, KnownSize known) async {
+    _check();
+    if (media.isEmpty) throw AskAiException('Add a photo or a video of the room first.');
+    final q = _Question(
+      _system,
+      _ask(known, media.length, media.any((m) => m.video)),
+      draftSchema(),
+      'room_plan',
+    );
+    return parseDraft(room, await _answer(media, q), known);
+  }
+
+  /// What the storage in [media] holds, for the user to check.
+  Future<StorageDraft> readStorage(List<VisionMedia> media) async {
+    _check();
+    if (media.isEmpty) throw AskAiException('Add a photo of the open cupboard or shelves first.');
+    final q = _Question(
+      _storageSystem,
+      'Here ${media.length == 1 ? 'is a photo' : 'are ${media.length} photos'} of storage. '
+          'List what is kept in it as JSON in the given shape. In "notes", say in one sentence what you '
+          'could not make out.',
+      storageSchema(),
+      'stored_things',
+    );
+    return parseStorage(await _answer(media, q));
+  }
+
+  void _check() {
     if (!canSee(setup.via)) {
       throw AskAiException(
         '${setup.via.label} cannot look at photos. Choose another way in Ask AI\'s settings.',
@@ -191,25 +228,24 @@ class VisionAsker {
     if (setup.via.needsKey && (key ?? '').trim().isEmpty) {
       throw AskAiException('Add your ${setup.via.label} key first.');
     }
-    if (media.isEmpty) throw AskAiException('Add a photo or a video of the room first.');
-    final text = switch (setup.via) {
-      HelpAi.gemini => await _gemini(media, known),
-      HelpAi.anthropic => await _anthropic(media, known),
-      _ => await _openAi(media, known),
-    };
-    return parseDraft(room, text, known);
   }
+
+  Future<String> _answer(List<VisionMedia> media, _Question q) => switch (setup.via) {
+    HelpAi.gemini => _gemini(media, q),
+    HelpAi.anthropic => _anthropic(media, q),
+    _ => _openAi(media, q),
+  };
 
   static const _geminiBase = 'https://generativelanguage.googleapis.com/v1beta';
 
-  Future<String> _gemini(List<VisionMedia> media, KnownSize known) async {
+  Future<String> _gemini(List<VisionMedia> media, _Question q) async {
     final j = await _send(
       http.Request('POST', Uri.parse('$_geminiBase/models/${setup.effectiveModel}:generateContent'))
         ..headers.addAll({'x-goog-api-key': (key ?? '').trim(), 'content-type': 'application/json'})
         ..body = jsonEncode({
           'system_instruction': {
             'parts': [
-              {'text': _system},
+              {'text': q.system},
             ],
           },
           'contents': [
@@ -220,18 +256,18 @@ class VisionAsker {
                   {
                     'inline_data': {'mime_type': m.mime, 'data': base64Encode(m.bytes)},
                   },
-                {'text': _ask(known, media.length, media.any((m) => m.video))},
+                {'text': q.prompt},
               ],
             },
           ],
-          'generationConfig': {'responseMimeType': 'application/json', 'responseJsonSchema': draftSchema()},
+          'generationConfig': {'responseMimeType': 'application/json', 'responseJsonSchema': q.schema},
         }),
     );
     final parts = _list(_map(_map(_list(j['candidates']).firstOrNull)['content'])['parts']);
     return _text([for (final p in parts) _map(p)['text']]);
   }
 
-  Future<String> _anthropic(List<VisionMedia> media, KnownSize known) async {
+  Future<String> _anthropic(List<VisionMedia> media, _Question q) async {
     final j = await _send(
       http.Request('POST', Uri.parse('https://api.anthropic.com/v1/messages'))
         ..headers.addAll({
@@ -245,10 +281,10 @@ class VisionAsker {
           'max_tokens': 16000,
           'output_config': {
             'effort': 'medium',
-            'format': {'type': 'json_schema', 'schema': draftSchema()},
+            'format': {'type': 'json_schema', 'schema': q.schema},
           },
           'fallbacks': 'default',
-          'system': _system,
+          'system': q.system,
           'messages': [
             {
               'role': 'user',
@@ -258,7 +294,7 @@ class VisionAsker {
                     'type': 'image',
                     'source': {'type': 'base64', 'media_type': m.mime, 'data': base64Encode(m.bytes)},
                   },
-                {'type': 'text', 'text': _ask(known, media.length, false)},
+                {'type': 'text', 'text': q.prompt},
               ],
             },
           ],
@@ -272,7 +308,7 @@ class VisionAsker {
     ]);
   }
 
-  Future<String> _openAi(List<VisionMedia> media, KnownSize known) async {
+  Future<String> _openAi(List<VisionMedia> media, _Question q) async {
     if (setup.effectiveModel.isEmpty) throw AskAiException('Pick a model first.');
     final j = await _send(
       http.Request('POST', Uri.parse('${_base()}/chat/completions'))
@@ -283,7 +319,7 @@ class VisionAsker {
         ..body = jsonEncode({
           'model': setup.effectiveModel,
           'messages': [
-            {'role': 'system', 'content': _system},
+            {'role': 'system', 'content': q.system},
             {
               'role': 'user',
               'content': [
@@ -292,13 +328,13 @@ class VisionAsker {
                     'type': 'image_url',
                     'image_url': {'url': 'data:${m.mime};base64,${base64Encode(m.bytes)}'},
                   },
-                {'type': 'text', 'text': _ask(known, media.length, false)},
+                {'type': 'text', 'text': q.prompt},
               ],
             },
           ],
           'response_format': {
             'type': 'json_schema',
-            'json_schema': {'name': 'room_plan', 'strict': true, 'schema': draftSchema()},
+            'json_schema': {'name': q.name, 'strict': true, 'schema': q.schema},
           },
         }),
     );
@@ -465,3 +501,85 @@ RoomDraft parseDraft(Room room, String text, KnownSize known) {
 
 /// Scale for a photo of [w]×[h] so its long edge is at most [edge].
 double fitScale(int w, int h, {int edge = 2576}) => math.min(1, edge / math.max(w, h));
+
+const _storageSystem = '''
+You list what is kept in storage (wardrobes, shelves, cabinets, drawers,
+racks) from photos, so the owner can organise it. Group alike things into one
+entry with a short plain name ("winter coats", "cookbooks", "spare bulbs")
+rather than listing every single item; at most 40 entries. For each, pick the
+closest sort from the list; guess how often it is used (daily, weekly or
+rare) from what it is, and whether it is heavy (needs two hands, or more than
+about 10 kg). Give each a confidence from 0 to 1. Only list what you can see.
+Do not describe people or anything private such as documents' contents.''';
+
+/// The JSON shape asked for when reading storage.
+Map<String, Object?> storageSchema() {
+  Map<String, Object?> obj(Map<String, Object?> props) => {
+    'type': 'object',
+    'properties': props,
+    'required': props.keys.toList(),
+    'additionalProperties': false,
+  };
+  return obj({
+    'things': {
+      'type': 'array',
+      'items': obj({
+        'name': {'type': 'string'},
+        'stuff': {
+          'type': 'string',
+          'enum': [for (final s in Stuff.values) s.name],
+        },
+        'use': {
+          'type': 'string',
+          'enum': [for (final u in Use.values) u.name],
+        },
+        'heavy': {'type': 'boolean'},
+        'confidence': {'type': 'number'},
+      }),
+    },
+    'notes': {'type': 'string'},
+  });
+}
+
+/// The things the AI saw in some storage.
+class StorageDraft {
+  const StorageDraft(this.things, {this.notes = ''});
+  final List<Seen<Thing>> things;
+  final String notes;
+}
+
+/// Turns the AI's [text] into things to check. Names are trimmed and kept
+/// short; nameless entries are dropped. Throws an [AskAiException] when the
+/// answer is not a list of things at all.
+StorageDraft parseStorage(String text) {
+  Object? j;
+  try {
+    final start = text.indexOf('{'), end = text.lastIndexOf('}');
+    j = start < 0 || end < start ? null : jsonDecode(text.substring(start, end + 1));
+  } on FormatException {
+    j = null;
+  }
+  if (j is! Map || j['things'] is! List) {
+    throw AskAiException('The answer was not a list of things. Try again or try another model.');
+  }
+  final things = <Seen<Thing>>[];
+  for (final (n, raw) in _list(j['things']).take(40).indexed) {
+    final t = _map(raw);
+    var name = '${t['name'] ?? ''}'.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (name.isEmpty) continue;
+    if (name.length > 60) name = '${name.substring(0, 59)}…';
+    things.add(
+      Seen(
+        Thing(
+          id: 'seen-t$n',
+          name: name,
+          stuff: Stuff.of('${t['stuff']}'),
+          use: Use.of('${t['use']}'),
+          heavy: t['heavy'] == true,
+        ),
+        _conf(t['confidence']),
+      ),
+    );
+  }
+  return StorageDraft(things, notes: '${j['notes'] ?? ''}'.trim());
+}

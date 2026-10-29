@@ -6,6 +6,7 @@ import '../app/providers.dart';
 import '../app/scan_media.dart';
 import '../db/database.dart';
 import '../domain/space.dart';
+import '../domain/stored.dart';
 import '../domain/vision.dart';
 import 'motion.dart';
 import 'plan_view.dart';
@@ -16,15 +17,44 @@ import 'room_page.dart';
 /// Ask AI's settings: asks first, sends, then shows the result to check.
 Future<void> startScan(BuildContext context, WidgetRef ref, Room room, String space) async {
   final media = ref.read(mediaProvider(room.id)).value ?? const <MediaRow>[];
+  final setup = await _seeingAi(context, ref);
+  if (setup == null || !context.mounted) return;
+  final choice = await showDialog<_ScanChoice>(
+    context: context,
+    builder: (context) => _ScanDialog(room: room, media: media, setup: setup),
+  );
+  if (choice == null || !context.mounted) return;
+  await Navigator.of(context)
+      .push(fluidRoute<void>(_ScanPage(room: room, space: space, setup: setup, choice: choice)));
+}
+
+/// Lists what the storage in the room's photos holds with the AI chosen in
+/// Ask AI's settings, for the user to check before it joins the room's list.
+Future<void> startStorageScan(BuildContext context, WidgetRef ref, Room room, String space) async {
+  final media = ref.read(mediaProvider(room.id)).value ?? const <MediaRow>[];
+  final setup = await _seeingAi(context, ref);
+  if (setup == null || !context.mounted) return;
+  final choice = await showDialog<_ScanChoice>(
+    context: context,
+    builder: (context) => _ScanDialog(room: room, media: media, setup: setup, storage: true),
+  );
+  if (choice == null || !context.mounted) return;
+  await Navigator.of(context)
+      .push(fluidRoute<void>(_StorageScanPage(room: room, space: space, setup: setup, choice: choice)));
+}
+
+/// The AI setup when it can look at pictures; otherwise offers to change it
+/// and returns null.
+Future<HelpAiSetup?> _seeingAi(BuildContext context, WidgetRef ref) async {
   final setup = await ref.read(helpAiProvider.future);
-  if (!context.mounted) return;
+  if (!context.mounted) return null;
   if (!canSee(setup.via)) {
     final change = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Choose an AI that can see'),
         content: Text(
-          'Making a plan from photos needs an AI that reads images: a free Gemini key, an Anthropic, '
+          'Reading photos needs an AI that sees images: a free Gemini key, an Anthropic, '
           'OpenAI or OpenRouter key, or a vision model on your own computer. '
           'Ask AI is set to “${setup.via.label}”.',
         ),
@@ -35,15 +65,9 @@ Future<void> startScan(BuildContext context, WidgetRef ref, Room room, String sp
       ),
     );
     if (change == true && context.mounted) await showAskAiSetup(context);
-    return;
+    return null;
   }
-  final choice = await showDialog<_ScanChoice>(
-    context: context,
-    builder: (context) => _ScanDialog(room: room, media: media, setup: setup),
-  );
-  if (choice == null || !context.mounted) return;
-  await Navigator.of(context)
-      .push(fluidRoute<void>(_ScanPage(room: room, space: space, setup: setup, choice: choice)));
+  return setup;
 }
 
 class _ScanChoice {
@@ -55,10 +79,13 @@ class _ScanChoice {
 /// Which pictures to send and what is known for sure, with a plain account
 /// of what leaves the device.
 class _ScanDialog extends StatefulWidget {
-  const _ScanDialog({required this.room, required this.media, required this.setup});
+  const _ScanDialog({required this.room, required this.media, required this.setup, this.storage = false});
   final Room room;
   final List<MediaRow> media;
   final HelpAiSetup setup;
+
+  /// Listing what storage holds rather than drawing the room.
+  final bool storage;
 
   @override
   State<_ScanDialog> createState() => _ScanDialogState();
@@ -76,7 +103,7 @@ class _ScanDialogState extends State<_ScanDialog> {
     final videos = picked.where((m) => m.kind == 'video').length;
     final whole = takesVideo(widget.setup.via);
     return AlertDialog(
-      title: const Text('Make a plan from photos'),
+      title: Text(widget.storage ? 'List what is stored' : 'Make a plan from photos'),
       content: SizedBox(
         width: 460,
         child: ListView(
@@ -95,16 +122,17 @@ class _ScanDialogState extends State<_ScanDialog> {
                 ),
               ),
             const Divider(),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              value: _sizeKnown,
-              onChanged: (v) => setState(() => _sizeKnown = v),
-              title: Text('The room is ${metresText(r.width)} × ${metresText(r.depth)} m'),
-              subtitle: const Text(
-                'Photos cannot show true size. If you measured the room, the plan is scaled to it; '
-                'otherwise sizes are judged from doors and furniture.',
+            if (!widget.storage)
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                value: _sizeKnown,
+                onChanged: (v) => setState(() => _sizeKnown = v),
+                title: Text('The room is ${metresText(r.width)} × ${metresText(r.depth)} m'),
+                subtitle: const Text(
+                  'Photos cannot show true size. If you measured the room, the plan is scaled to it; '
+                  'otherwise sizes are judged from doors and furniture.',
+                ),
               ),
-            ),
             const SizedBox(height: 8),
             Text(
               'Sending ${picked.length - videos} photo${picked.length - videos == 1 ? '' : 's'}'
@@ -121,7 +149,9 @@ class _ScanDialogState extends State<_ScanDialog> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Take the first photo facing the wall you want at the top of the plan.',
+              widget.storage
+                  ? 'Photograph each cupboard, shelf or drawer open, close enough to see what is in it.'
+                  : 'Take the first photo facing the wall you want at the top of the plan.',
               style: t.textTheme.bodySmall?.copyWith(color: t.colorScheme.onSurfaceVariant),
             ),
           ],
@@ -350,6 +380,164 @@ class _ScanPageState extends ConsumerState<_ScanPage> {
             buttons,
           ],
         );
+      },
+    );
+  }
+}
+
+/// Prepares and sends the pictures, then lists the things the AI saw for
+/// the user to tick and add to the room's storage list.
+class _StorageScanPage extends ConsumerStatefulWidget {
+  const _StorageScanPage({
+    required this.room,
+    required this.space,
+    required this.setup,
+    required this.choice,
+  });
+  final Room room;
+  final String space;
+  final HelpAiSetup setup;
+  final _ScanChoice choice;
+
+  @override
+  ConsumerState<_StorageScanPage> createState() => _StorageScanPageState();
+}
+
+class _StorageScanPageState extends ConsumerState<_StorageScanPage> {
+  String _step = 'Preparing the photos';
+  Object? _error;
+  StorageDraft? _draft;
+  final _left = <String>{};
+
+  @override
+  void initState() {
+    super.initState();
+    _run();
+  }
+
+  Future<void> _run() async {
+    setState(() {
+      _error = null;
+      _draft = null;
+      _step = 'Preparing the photos';
+    });
+    try {
+      final media = await prepareMedia(
+        widget.choice.media,
+        wholeVideo: false,
+        step: (s) => mounted ? setState(() => _step = s) : null,
+      );
+      if (!mounted) return;
+      setState(() => _step = 'Waiting for ${widget.setup.via.label} to look');
+      final asker = await ref.read(visionAskerProvider)(widget.setup);
+      final draft = await asker.readStorage(media);
+      if (!mounted) return;
+      setState(() {
+        _draft = draft;
+        _left
+          ..clear()
+          ..addAll([
+            for (final t in draft.things)
+              if (t.unsure) t.value.id,
+          ]);
+      });
+    } catch (e) {
+      if (mounted) setState(() => _error = e);
+    }
+  }
+
+  Future<void> _add(StorageDraft d) async {
+    final now = ref.read(roomProvider(widget.room.id)).value ?? widget.room;
+    final kept = [
+      for (final s in d.things)
+        if (!_left.contains(s.value.id)) Thing.fromJson({...s.value.toJson(), 'id': newId()}),
+    ];
+    await storeRoom(ref, now.copyWith(things: [...now.things, ...kept]), widget.space);
+    if (mounted) Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final t = Theme.of(context);
+    return Scaffold(
+      appBar: AppBar(title: Text('Stored in ${widget.room.name}')),
+      body: switch ((_draft, _error)) {
+        (_, final Object e) => EmptyState(
+          icon: Icons.error_outline,
+          title: 'The photos could not be read',
+          message: e is UserFacingError ? '$e' : 'Something went wrong: $e',
+          actions: [FilledButton(onPressed: _run, child: const Text('Try again'))],
+        ),
+        (null, _) => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const CircularProgressIndicator(),
+              const SizedBox(height: 16),
+              AnimatedSwitcher(
+                duration: Motion.short,
+                child: Text(_step, key: ValueKey(_step)),
+              ),
+            ],
+          ),
+        ),
+        (final StorageDraft d, _) => ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            Readable(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  if (d.notes.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Text(
+                        d.notes,
+                        style: t.textTheme.bodyMedium?.copyWith(fontStyle: FontStyle.italic),
+                      ),
+                    ),
+                  Text(
+                    d.things.isEmpty
+                        ? 'Nothing stored was recognised. Try a closer photo with the doors open.'
+                        : 'Untick anything that is wrong; unsure guesses start unticked. How often each is used '
+                              'is a guess: change it on the Storage tab.',
+                    style: t.textTheme.bodySmall?.copyWith(color: t.colorScheme.onSurfaceVariant),
+                  ),
+                  for (final s in d.things)
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      value: !_left.contains(s.value.id),
+                      onChanged: (v) =>
+                          setState(() => v == true ? _left.remove(s.value.id) : _left.add(s.value.id)),
+                      title: Text(s.value.name),
+                      subtitle: Text(
+                        [
+                          s.value.stuff.label,
+                          s.value.use.label.toLowerCase(),
+                          if (s.value.heavy) 'heavy',
+                          '${s.unsure ? 'unsure' : 'sure'} (${(s.confidence * 100).round()}%)',
+                        ].join(' · '),
+                      ),
+                    ),
+                  const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      FilledButton.icon(
+                        onPressed: d.things.length == _left.length ? null : () => _add(d),
+                        icon: const Icon(Icons.playlist_add),
+                        label: const Text('Add these to the list'),
+                      ),
+                      OutlinedButton(onPressed: _run, child: const Text('Ask again')),
+                      TextButton(onPressed: () => Navigator.pop(context), child: const Text('Discard')),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       },
     );
   }

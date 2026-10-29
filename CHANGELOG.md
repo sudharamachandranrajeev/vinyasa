@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0 (unreleased)
+
+- List from photos on the Storage tab: photograph open cupboards, shelves or drawers and the AI chosen in
+  Ask AI lists what they hold, grouped ("winter coats", "cookbooks"), with the sort of thing, a guess
+  at how often it is used and whether it is heavy. Unsure guesses start unticked; nothing joins the list
+  until checked. Photos are shrunk and stripped of location and camera details first, as for plans.
+
 ## 0.1.0 (2026-10-28)
 
 - Spaces and rooms: homes, offices, shops, clinics and studios, each with rooms of 18 kinds. A room

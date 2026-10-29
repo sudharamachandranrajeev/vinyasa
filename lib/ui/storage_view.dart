@@ -3,16 +3,21 @@ import 'dart:typed_data';
 
 import 'package:brahma_core/brahma_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../app/providers.dart';
 
 import '../domain/space.dart';
 import '../domain/stored.dart';
 import 'common.dart';
 import 'motion.dart';
+import 'scan_view.dart';
 
 /// What the room's storage holds, and where each thing should go.
-class StorageView extends StatelessWidget {
-  const StorageView({super.key, required this.room, required this.onChanged});
+class StorageView extends ConsumerWidget {
+  const StorageView({super.key, required this.room, required this.space, required this.onChanged});
   final Room room;
+  final String space;
   final ValueChanged<Room> onChanged;
 
   void _set(List<Thing> things) => onChanged(room.copyWith(things: things));
@@ -31,9 +36,10 @@ class StorageView extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = Theme.of(context);
     final plan = organise(room);
+    final photos = ref.watch(mediaProvider(room.id)).value?.isNotEmpty ?? false;
     final muted = t.textTheme.bodySmall?.copyWith(color: t.colorScheme.onSurfaceVariant);
     final today = DateTime.now();
     return ListView(
@@ -85,10 +91,27 @@ class StorageView extends StatelessWidget {
                         ),
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
-                        child: FilledButton.tonalIcon(
-                          onPressed: () => _edit(context, null),
-                          icon: const Icon(Icons.add),
-                          label: const Text('Add things'),
+                        child: Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            FilledButton.tonalIcon(
+                              onPressed: () => _edit(context, null),
+                              icon: const Icon(Icons.add),
+                              label: const Text('Add things'),
+                            ),
+                            OutlinedButton.icon(
+                              onPressed: photos ? () => startStorageScan(context, ref, room, space) : null,
+                              icon: const Icon(Icons.auto_fix_high_outlined),
+                              label: const Text('List from photos'),
+                            ),
+                            if (!photos)
+                              Text(
+                                'Add photos of the open cupboards on the Photos tab to list from them.',
+                                style: muted,
+                              ),
+                          ],
                         ),
                       ),
                     ],

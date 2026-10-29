@@ -9,6 +9,7 @@ import 'package:image/image.dart' as img;
 import 'package:vinyasa/domain/photo_prep.dart';
 import 'package:vinyasa/domain/samples.dart';
 import 'package:vinyasa/domain/space.dart';
+import 'package:vinyasa/domain/stored.dart';
 import 'package:vinyasa/domain/vision.dart';
 
 /// A plan as an AI might draw it: the room a little off in size, one item
@@ -62,6 +63,16 @@ String planJson({int width = 3000, int depth = 2500}) => jsonEncode({
 
 final _photo = VisionMedia(Uint8List.fromList([1, 2, 3]), 'image/jpeg');
 
+/// An AI's answer listing what a wardrobe holds.
+String storageJson() => jsonEncode({
+  'things': [
+    {'name': '  Winter   coats ', 'stuff': 'clothes', 'use': 'rare', 'heavy': false, 'confidence': 0.9},
+    {'name': 'Toolbox', 'stuff': 'tools', 'use': 'weekly', 'heavy': true, 'confidence': 0.3},
+    {'name': '', 'stuff': 'misc', 'use': 'daily', 'heavy': false, 'confidence': 0.9},
+  ],
+  'notes': 'The top shelf was dark.',
+});
+
 void main() {
   final room = sampleBedroom('b');
 
@@ -102,6 +113,30 @@ void main() {
     expect(cleanPhoto(Uint8List.fromList([0, 1, 2])), isNull);
   });
 
+  test('stored things are read, tidied and marked when unsure; junk is refused', () {
+    final d = parseStorage('```json\n${storageJson()}\n```');
+    expect(d.things, hasLength(2), reason: 'a nameless entry is dropped');
+    final coats = d.things.first;
+    expect(
+      (coats.value.name, coats.value.stuff, coats.value.use, coats.unsure),
+      ('Winter coats', Stuff.clothes, Use.rare, false),
+    );
+    expect((d.things.last.value.heavy, d.things.last.unsure), (true, true));
+    expect(d.notes, 'The top shelf was dark.');
+    final odd = parseStorage(
+      jsonEncode({
+        'things': [
+          {'name': 'x' * 80, 'stuff': 'spaceships', 'use': 'hourly'},
+        ],
+      }),
+    );
+    expect(
+      (odd.things.single.value.name.length, odd.things.single.value.stuff, odd.things.single.value.use),
+      (60, Stuff.misc, Use.weekly),
+    );
+    expect(() => parseStorage('{"plan": []}'), throwsA(isA<AskAiException>()));
+  });
+
   group('requests', () {
     late http.Request sent;
     VisionAsker asker(HelpAi via, Map<String, Object?> reply) => VisionAsker(
@@ -131,6 +166,20 @@ void main() {
       expect((content.first as Map)['type'], 'image');
       expect(((content.first as Map)['source'] as Map)['data'], base64Encode([1, 2, 3]));
       expect(d.items, hasLength(3));
+    });
+
+    test('storage: the same providers, asked for things in their own JSON shape', () async {
+      final d = await asker(HelpAi.openai, {
+        'choices': [
+          {
+            'message': {'content': storageJson()},
+          },
+        ],
+      }).readStorage([_photo]);
+      final b = body();
+      expect(((b['response_format'] as Map)['json_schema'] as Map)['name'], 'stored_things');
+      expect(((b['messages'] as List).first as Map)['content'], contains('storage'));
+      expect(d.things.map((t) => t.value.name), ['Winter coats', 'Toolbox']);
     });
 
     test('Anthropic: a refusal is reported, not parsed', () async {
