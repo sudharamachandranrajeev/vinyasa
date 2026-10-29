@@ -67,6 +67,9 @@ void main() {
     expect((e.kind, e.headline, e.when.year), ('native', 'boom', 2026));
   });
 
+  // Made up, and built here so secret scanners do not flag the test.
+  final fakeGoogleKey = 'AIza${'x' * 35}';
+
   test('leaves out the home folder, the account name and e-mail addresses', () {
     const env = {'HOME': '/home/someone', 'USER': 'someone'};
     expect(
@@ -75,7 +78,7 @@ void main() {
     );
     expect(
       redact(
-        'GET https://x.googleapis.com/v1/m?alt=sse&key=AIzaSyA1234567890abcdefghijklmnopqrstu failed; '
+        'GET https://x.googleapis.com/v1/m?alt=sse&key=$fakeGoogleKey failed; '
         'Authorization: Bearer abc.def; x-api-key: secret123; sk-ant-api03-abcdefghijklmnopqrstuv',
         environment: const {},
       ),
