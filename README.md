@@ -61,8 +61,8 @@ measure carefully.
 | --- | --- |
 | Vaastu | Off, gentle (advice) or strict (weighs more in the score), for each room |
 | Scores | Space, access, comfort, look and Vaastu, weighed by what matters in that room |
-| Storage methods | KonMari order at home, 5S at work, ABC slotting in a storeroom |
-| Idea searches | Pinterest, Houzz, Behance, Dribbble and Unsplash, built from the room and look |
+| Storage methods | Tidy-by-category order at home, 5S at work, ABC slotting in a storeroom |
+| Idea searches | Popular design and photo sites, built from the room and look |
 | Idea photos | [Openverse](https://openverse.org) (no account) or [Unsplash](https://unsplash.com) (your own free key) |
 | AI for photos | Gemini (free key), Anthropic, OpenAI, OpenRouter, or a vision model on your own computer |
 | Themes | Eight themes made for interiors, your own in the theme editor, light and dark |
@@ -104,7 +104,7 @@ the newest release, pick the file for your device:
 
 | Your device | File to download | Works on |
 | --- | --- | --- |
-| 🐧 Linux computer | `Vinyasa-<version>-linux-x64.tar.gz` | Ubuntu 24.04, Fedora, Arch and similar (Intel/AMD 64-bit) |
+| 🐧 Linux computer | `Vinyasa-<version>-linux-x64.tar.gz` | Ubuntu 24.04, Fedora, Arch and similar (64-bit x86) |
 | 🪟 Windows computer | `Vinyasa-<version>-windows-x64-setup.exe` | Windows 10 (version 1809) and 11, 64-bit |
 | 🤖 Android phone or tablet | `Vinyasa-<version>-android.apk` | Android 7 and newer |
 
@@ -146,7 +146,7 @@ Prefer no installer? Download `…-windows-x64-portable.zip`, unzip it anywhere 
 
 1. Open the downloaded `.apk` on your phone.
 2. If Android asks, allow installs from your browser or file manager. This is normal for apps
-   from outside the Play Store.
+   from outside an app store.
 3. Tap **Install**, then **Open**.
 
 Newer versions install over the top and keep your data.
@@ -289,7 +289,7 @@ scripts/make-icons.sh                                                     # app 
   over [SQLite3MultipleCiphers](https://utelle.github.io/SQLite3MultipleCiphers/) for the encrypted
   database
 - [Inter](https://rsms.me/inter/) and [Plus Jakarta Sans](https://github.com/tokotype/PlusJakartaSans) fonts
-- [Openverse](https://openverse.org) and [Unsplash](https://unsplash.com) for idea photos
+- [Openverse](https://openverse.org) for idea photos
 - [FFmpeg](https://ffmpeg.org) for video frames on computers
 
 </details>
