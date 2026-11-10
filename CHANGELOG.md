@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1 (2026-11-10)
+
+- Windows: the installer has its own id. Before, it shared one with other Brahma apps, so Windows could install it into another app's folder and replace its Start menu shortcut. Install this version to move it to its own folder; your data is not touched.
+
 ## 0.2.0 (2026-10-29)
 
 - List from photos on the Storage tab: photograph open cupboards, shelves or drawers and the AI chosen in

@@ -10,7 +10,8 @@
 #define Release "..\..\build\windows\x64\runner\Release"
 
 [Setup]
-AppId={{3B4C320B-9334-480A-84EB-F11BB6917594}
+; Own id: until now it wrongly shared Bahya Nireekshana's, so Windows treated the apps as one.
+AppId={{6AFDD642-E453-4A64-A34D-835F44165BA5}
 AppName=Vinyasa
 AppVersion={#AppVersion}
 AppVerName=Vinyasa {#AppVersion}
@@ -49,3 +50,32 @@ Name: "{autodesktop}\Vinyasa"; Filename: "{app}\vinyasa.exe"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\vinyasa.exe"; Description: "{cm:LaunchProgram,Vinyasa}"; Flags: nowait postinstall skipifsilent
+
+[Code]
+const
+  OldKey = 'Software\Microsoft\Windows\CurrentVersion\Uninstall\{3B4C320B-9334-480A-84EB-F11BB6917594}_is1';
+
+{ Older versions installed under an id shared with other Brahma apps, often
+  into another app's folder. Remove only what is Vinyasa's: its old exe, and
+  the old uninstall entry when it still names this app (its uninstaller would
+  delete the whole shared folder). Other apps' files are left alone. }
+procedure RemoveOld(Root: Integer);
+var
+  Name, Dir: String;
+begin
+  if RegQueryStringValue(Root, OldKey, 'DisplayName', Name) and (Name = 'Vinyasa') then
+  begin
+    if RegQueryStringValue(Root, OldKey, 'InstallLocation', Dir) then
+      DeleteFile(AddBackslash(Dir) + 'vinyasa.exe');
+    RegDeleteKeyIncludingSubkeys(Root, OldKey);
+  end;
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if CurStep = ssInstall then
+  begin
+    RemoveOld(HKCU);
+    if IsAdminInstallMode then RemoveOld(HKLM);
+  end;
+end;
