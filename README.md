@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  <a href="https://github.com/sudharamachandranrajeev/vinyasa"><img src="branding/vinyasa-512.png" alt="Vinyasa" width="140"></a>
+  <a href="https://github.com/sudharamachandranrajeev/vinyasa-space-organiser"><img src="branding/vinyasa-512.png" alt="Vinyasa" width="140"></a>
   <br>
   Vinyasa
   <br>
@@ -9,10 +9,10 @@
 <h4 align="center">Plan any room, see what is wrong with it, and rearrange it step by step: at home, at work or in a shop.</h4>
 
 <p align="center">
-  <a href="https://github.com/sudharamachandranrajeev/vinyasa/releases"><img src="https://img.shields.io/github/v/release/sudharamachandranrajeev/vinyasa?include_prereleases&color=b5562f&label=download" alt="Latest release"></a>
+  <a href="https://github.com/sudharamachandranrajeev/vinyasa-space-organiser/releases"><img src="https://img.shields.io/github/v/release/sudharamachandranrajeev/vinyasa-space-organiser?include_prereleases&color=b5562f&label=download" alt="Latest release"></a>
   <img src="https://img.shields.io/badge/works%20on-Linux%20%7C%20Windows%20%7C%20Android-555" alt="Works on Linux, Windows and Android">
   <img src="https://img.shields.io/badge/license-MIT-2e7d32" alt="MIT licence">
-  <a href="https://github.com/sudharamachandranrajeev/brahma"><img src="https://img.shields.io/badge/part%20of-Brahma-8a5cf6" alt="Part of Brahma"></a>
+  <a href="https://github.com/sudharamachandranrajeev/brahma-life-suite"><img src="https://img.shields.io/badge/part%20of-Brahma-8a5cf6" alt="Part of Brahma"></a>
 </p>
 
 <p align="center">
@@ -100,7 +100,7 @@ measure carefully.
 
 ### Step 1 – Download
 
-Open the [releases page](https://github.com/sudharamachandranrajeev/vinyasa/releases) and, under
+Open the [releases page](https://github.com/sudharamachandranrajeev/vinyasa-space-organiser/releases) and, under
 the newest release, pick the file for your device:
 
 | Your device | File to download | Works on |
@@ -181,7 +181,7 @@ installed.
 
 Open **Settings → Sync → Set up sync** and follow the steps. You need a Brahma
 sync server, at home or on Cloudflare's free plan;
-[Adisthanam](https://github.com/sudharamachandranrajeev/adisthanam) sets one up at home.
+[Adisthanam](https://github.com/sudharamachandranrajeev/adisthanam-home-server) sets one up at home.
 
 ## 🧭 How it works
 
@@ -282,7 +282,7 @@ matters to you, when you edit the room.
 You need [Git](https://git-scm.com) and [Flutter](https://flutter.dev) 3.47.
 
 ```bash
-git clone https://github.com/sudharamachandranrajeev/vinyasa
+git clone https://github.com/sudharamachandranrajeev/vinyasa-space-organiser
 cd vinyasa
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs
@@ -318,11 +318,11 @@ Vinyasa is one app in the **Brahma** family. They share one sign-in and one sync
 
 | App | What it does |
 | --- | --- |
-| [brahma](https://github.com/sudharamachandranrajeev/brahma) | The shared core and the all-in-one app |
-| [adisthanam](https://github.com/sudharamachandranrajeev/adisthanam) | Your own sync server, set up with one command |
-| [artha](https://github.com/sudharamachandranrajeev/artha) | Money, accounts and investments |
-| [graha-anveshana](https://github.com/sudharamachandranrajeev/graha-anveshana) | Find a home to rent or buy |
-| [vidya](https://github.com/sudharamachandranrajeev/vidya) | Learning, flashcards and focus |
+| [brahma](https://github.com/sudharamachandranrajeev/brahma-life-suite) | The shared core and the all-in-one app |
+| [adisthanam](https://github.com/sudharamachandranrajeev/adisthanam-home-server) | Your own sync server, set up with one command |
+| [artha](https://github.com/sudharamachandranrajeev/artha-personal-finance) | Money, accounts and investments |
+| [graha-anveshana](https://github.com/sudharamachandranrajeev/graha-anveshana-property-search) | Find a home to rent or buy |
+| [vidya](https://github.com/sudharamachandranrajeev/vidya-learning-manager) | Learning, flashcards and focus |
 
 ## License
 

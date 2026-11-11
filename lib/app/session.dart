@@ -8,7 +8,7 @@ const vinyasaIdentity = AppIdentity(
   id: 'vinyasa',
   name: 'Vinyasa',
   androidPackage: 'dev.brahma.vinyasa',
-  releases: 'sudharamachandranrajeev/vinyasa',
+  releases: 'sudharamachandranrajeev/vinyasa-space-organiser',
 );
 
 /// Everything a running app needs: keys, the encrypted database and the

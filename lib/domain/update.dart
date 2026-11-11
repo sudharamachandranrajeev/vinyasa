@@ -21,9 +21,9 @@ class UpdateException implements Exception, UserFacingError {
 /// The list, not /releases/latest: that one skips pre-releases, and every
 /// v0.* release is published as one.
 final releasesUrl = Uri.parse(
-  'https://api.github.com/repos/sudharamachandranrajeev/vinyasa/releases?per_page=20',
+  'https://api.github.com/repos/sudharamachandranrajeev/vinyasa-space-organiser/releases?per_page=20',
 );
-const releasesPage = 'https://github.com/sudharamachandranrajeev/vinyasa/releases';
+const releasesPage = 'https://github.com/sudharamachandranrajeev/vinyasa-space-organiser/releases';
 
 /// The file each release publishes its checksums in (release.yml).
 const checksumsName = 'SHA256SUMS.txt';
